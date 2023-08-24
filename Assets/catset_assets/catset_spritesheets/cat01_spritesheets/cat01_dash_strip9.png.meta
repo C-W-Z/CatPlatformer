@@ -126,12 +126,12 @@ TextureImporter:
       name: cat01_dash_strip9_0
       rect:
         serializedVersion: 2
-        x: 4
-        y: 4
-        width: 32
-        height: 32
+        x: 0
+        y: 0
+        width: 40
+        height: 40
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -147,12 +147,12 @@ TextureImporter:
       name: cat01_dash_strip9_1
       rect:
         serializedVersion: 2
-        x: 44
-        y: 4
-        width: 32
-        height: 32
+        x: 40
+        y: 0
+        width: 40
+        height: 40
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -168,12 +168,12 @@ TextureImporter:
       name: cat01_dash_strip9_2
       rect:
         serializedVersion: 2
-        x: 84
-        y: 4
-        width: 32
-        height: 32
+        x: 80
+        y: 0
+        width: 40
+        height: 40
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -189,12 +189,12 @@ TextureImporter:
       name: cat01_dash_strip9_3
       rect:
         serializedVersion: 2
-        x: 124
-        y: 4
-        width: 32
-        height: 32
+        x: 120
+        y: 0
+        width: 40
+        height: 40
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -210,12 +210,12 @@ TextureImporter:
       name: cat01_dash_strip9_4
       rect:
         serializedVersion: 2
-        x: 164
-        y: 4
-        width: 32
-        height: 32
+        x: 160
+        y: 0
+        width: 40
+        height: 40
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -231,12 +231,12 @@ TextureImporter:
       name: cat01_dash_strip9_5
       rect:
         serializedVersion: 2
-        x: 204
-        y: 4
-        width: 32
-        height: 32
+        x: 200
+        y: 0
+        width: 40
+        height: 40
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -252,12 +252,12 @@ TextureImporter:
       name: cat01_dash_strip9_6
       rect:
         serializedVersion: 2
-        x: 244
-        y: 4
-        width: 32
-        height: 32
+        x: 240
+        y: 0
+        width: 40
+        height: 40
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -273,12 +273,12 @@ TextureImporter:
       name: cat01_dash_strip9_7
       rect:
         serializedVersion: 2
-        x: 284
-        y: 4
-        width: 32
-        height: 32
+        x: 280
+        y: 0
+        width: 40
+        height: 40
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -294,12 +294,12 @@ TextureImporter:
       name: cat01_dash_strip9_8
       rect:
         serializedVersion: 2
-        x: 324
-        y: 4
-        width: 32
-        height: 32
+        x: 320
+        y: 0
+        width: 40
+        height: 40
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []

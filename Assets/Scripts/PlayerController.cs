@@ -53,7 +53,7 @@ public class PlayerController : MonoBehaviour
         if (jumpUp && isJumping && rb.velocity.y > 0)
             JumpCut();
         if (ledgeDetected && canGrabLedge)
-            StartCoroutine(LedgeGrab());
+            LedgeGrab();
 
         #endregion
 
@@ -188,7 +188,6 @@ ledge_grabbing:
         yield return new WaitForSeconds(timeBeforeJump);
         // jump
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-        animator.ResetJumpAnimation();
         isJumping = true;
         lastOnGroundTimer = 0;
     }
@@ -231,7 +230,7 @@ ledge_grabbing:
     [Header("Ledge Info")]
     [SerializeField] private Vector2 offsetBefore = new(0.14f, 0.22f);
     [SerializeField] private Vector2 offsetAfter = new(0.35f, 0.4f);
-    [SerializeField] private Vector2 rayRightOffset = new(0f, -0.15f);
+    [SerializeField] private Vector2 rayRightOffset = new(0f, -0.18f);
     [SerializeField] private Vector2 rayDownOffset = new(0.27f, 0f);
     private Vector2 ledgeClimbPosBefore;
     private Vector2 ledgeClimbPosAfter;
@@ -239,7 +238,7 @@ ledge_grabbing:
     private bool ledgeGrabbing = false;
     public bool ledgeClimbing { get; private set; } = false;
 
-    private IEnumerator LedgeGrab()
+    private void LedgeGrab()
     {
         // get corner position
         Vector2 cornerPos = transform.position;
@@ -253,17 +252,14 @@ ledge_grabbing:
             cornerPos.y = hit.point.y;
         else Debug.Log("no down hit");
 
-        canGrabLedge = false;
-
+        // set ledge grab and climb position
         ledgeClimbPosBefore = cornerPos + new Vector2(offsetBefore.x * (isFaceRight ? 1 : -1), offsetBefore.y);
         ledgeClimbPosAfter = cornerPos + new Vector2(offsetAfter.x * (isFaceRight ? 1 : -1), offsetAfter.y);;
-
-        animator.SetLedgeGrabAnimation();
-
+        // grab
+        canGrabLedge = false;
         ledgeGrabbing = true;
-
-        yield return new WaitForSeconds(0.1f);
-        animator.ResetLedgeGrabAnimation();
+        // start grab animation
+        animator.SetLedgeGrabAnimation();
     }
 
     private void LedgeClimb()
@@ -281,7 +277,7 @@ ledge_grabbing:
         canGrabLedge = true;
     }
 
-    void OnDrawGizmos()
+    private void DrawRayForLedgePos()
     {
         Gizmos.color = Color.magenta;
         Gizmos.DrawLine(transform.position + (Vector3)rayRightOffset, transform.position + (Vector3)rayRightOffset + new Vector3(0.5f * (isFaceRight ? 1 : -1), 0, 0));
@@ -289,4 +285,9 @@ ledge_grabbing:
     }
 
 #endregion
+
+    void OnDrawGizmos()
+    {
+        DrawRayForLedgePos();
+    }
 }

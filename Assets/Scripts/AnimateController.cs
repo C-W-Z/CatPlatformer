@@ -6,17 +6,10 @@ public class AnimateController : MonoBehaviour
 {
     [SerializeField] private Animator animator;
     [SerializeField] private PlayerController player;
+    [SerializeField] private float resetDelayTime = 0.1f;
     private bool startJumpAnimation = false;
     private bool startLedgeGrabAnimation = false;
 
-    public void SetJumpAnimation()
-    {
-        startJumpAnimation = true;
-    }
-    public void ResetJumpAnimation()
-    {
-        startJumpAnimation = false;
-    }
     public void SetAnimation()
     {
         animator.SetBool("onGround", player.onGround);
@@ -25,15 +18,29 @@ public class AnimateController : MonoBehaviour
         animator.SetBool("startJump", startJumpAnimation);
         animator.SetBool("startLedgeGrab", startLedgeGrabAnimation);
         animator.SetBool("ledgeClimbing", player.ledgeClimbing);
+
+        if (startJumpAnimation)
+            Invoke(nameof(ResetJumpAnimation), resetDelayTime);
+        if (startLedgeGrabAnimation)
+            Invoke(nameof(ResetLedgeGrabAnimation), resetDelayTime);
+    }
+    public void SetJumpAnimation()
+    {
+        startJumpAnimation = true;
+    }
+    private void ResetJumpAnimation()
+    {
+        startJumpAnimation = false;
     }
     public void SetLedgeGrabAnimation()
     {
         startLedgeGrabAnimation = true;
     }
-    public void ResetLedgeGrabAnimation()
+    private void ResetLedgeGrabAnimation()
     {
         startLedgeGrabAnimation = false;
     }
+    // for animation event
     public void LedgeClimbEnd()
     {
         player.LedgeClimbOver();

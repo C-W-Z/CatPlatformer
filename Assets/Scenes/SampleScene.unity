@@ -883,7 +883,7 @@ MonoBehaviour:
   fallGravityMult: 1.5
   offsetBefore: {x: 0.14, y: 0.22}
   offsetAfter: {x: 0.35, y: 0.4}
-  rayRightOffset: {x: 0, y: -0.15}
+  rayRightOffset: {x: 0, y: -0.18}
   rayDownOffset: {x: 0.27, y: 0}
 --- !u!60 &910239153
 PolygonCollider2D:
@@ -1686,6 +1686,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 2062787985}
   player: {fileID: 910239152}
+  resetDelayTime: 0.1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
