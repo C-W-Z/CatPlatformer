@@ -5,9 +5,10 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Components")]
     [SerializeField] private Transform tf;
-    public Rigidbody2D rb { get; private set; }
+    [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Collider2D cl;
     [SerializeField] private AnimateController animator;
+    public Rigidbody2D RB => rb;
 
 #region Mono Behaviour
 

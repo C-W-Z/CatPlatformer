@@ -861,6 +861,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tf: {fileID: 910239150}
+  rb: {fileID: 910239147}
   cl: {fileID: 910239153}
   animator: {fileID: 2062787986}
   groundLayer:

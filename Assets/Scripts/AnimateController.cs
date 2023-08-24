@@ -11,8 +11,8 @@ public class AnimateController : MonoBehaviour
     public void SetAnimation()
     {
         animator.SetBool("onGround", player.onGround);
-        animator.SetFloat("xSpeed", Mathf.Abs(player.rb.velocity.x));
-        animator.SetFloat("yVeloc", player.rb.velocity.y);
+        animator.SetFloat("xSpeed", Mathf.Abs(player.RB.velocity.x));
+        animator.SetFloat("yVeloc", player.RB.velocity.y);
         animator.SetBool("startJump", startJumpAnimation);
         animator.SetBool("startLedgeGrab", startLedgeGrabAnimation);
         animator.SetBool("ledgeClimbing", player.ledgeClimbing);
