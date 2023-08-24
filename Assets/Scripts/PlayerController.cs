@@ -1,13 +1,13 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
     [Header("Components")]
-    public Rigidbody2D rb;
-    public Collider2D cl;
-    public AnimateController animator;
+    [SerializeField] private Transform tf;
+    public Rigidbody2D rb { get; private set; }
+    [SerializeField] private Collider2D cl;
+    [SerializeField] private AnimateController animator;
 
 #region Mono Behaviour
 
@@ -64,7 +64,7 @@ ledge_grabbing:
         if (ledgeGrabbing || ledgeClimbing)
         {
             cl.isTrigger = true;
-            transform.position = (Vector3)ledgeClimbPosBefore;
+            tf.position = (Vector3)ledgeClimbPosBefore;
             rb.velocity = Vector2.zero;
             rb.gravityScale = 0;
 
@@ -157,7 +157,7 @@ ledge_grabbing:
         if ((rb.velocity.x > 0 && !isFaceRight) ||
             (rb.velocity.x < 0 && isFaceRight))
         {
-            transform.localScale = new Vector2(-transform.localScale.x, transform.localScale.y);
+            tf.localScale = new Vector2(-tf.localScale.x, tf.localScale.y);
             isFaceRight = !isFaceRight;
         }
     }
@@ -187,7 +187,7 @@ ledge_grabbing:
         // wait for animation frames before jump up
         yield return new WaitForSeconds(timeBeforeJump);
         // jump
-        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        rb.AddForce(jumpForce * Vector2.up, ForceMode2D.Impulse);
         isJumping = true;
         lastOnGroundTimer = 0;
     }
@@ -241,20 +241,20 @@ ledge_grabbing:
     private void LedgeGrab()
     {
         // get corner position
-        Vector2 cornerPos = transform.position;
+        Vector2 cornerPos = tf.position;
         RaycastHit2D hit;
-        hit = Physics2D.Raycast((Vector2)transform.position + rayRightOffset, isFaceRight ? Vector2.right : Vector2.left);
+        hit = Physics2D.Raycast((Vector2)tf.position + rayRightOffset, isFaceRight ? Vector2.right : Vector2.left);
         if (hit.collider != null)
             cornerPos.x = hit.point.x;
         else  Debug.Log("no front hit");
-        hit = Physics2D.Raycast((Vector2)transform.position + rayDownOffset * (isFaceRight ? 1 : -1), Vector2.down);
+        hit = Physics2D.Raycast((Vector2)tf.position + rayDownOffset * (isFaceRight ? 1 : -1), Vector2.down);
         if (hit.collider != null)
             cornerPos.y = hit.point.y;
         else Debug.Log("no down hit");
 
         // set ledge grab and climb position
         ledgeClimbPosBefore = cornerPos + new Vector2(offsetBefore.x * (isFaceRight ? 1 : -1), offsetBefore.y);
-        ledgeClimbPosAfter = cornerPos + new Vector2(offsetAfter.x * (isFaceRight ? 1 : -1), offsetAfter.y);;
+        ledgeClimbPosAfter = cornerPos + new Vector2(offsetAfter.x * (isFaceRight ? 1 : -1), offsetAfter.y);
         // grab
         canGrabLedge = false;
         ledgeGrabbing = true;
@@ -270,7 +270,7 @@ ledge_grabbing:
 
     public void LedgeClimbOver()
     {
-        transform.position = ledgeClimbPosAfter;
+        tf.position = ledgeClimbPosAfter;
         cl.isTrigger = false;
         ledgeGrabbing = false;
         ledgeClimbing = false;
@@ -280,8 +280,8 @@ ledge_grabbing:
     private void DrawRayForLedgePos()
     {
         Gizmos.color = Color.magenta;
-        Gizmos.DrawLine(transform.position + (Vector3)rayRightOffset, transform.position + (Vector3)rayRightOffset + new Vector3(0.5f * (isFaceRight ? 1 : -1), 0, 0));
-        Gizmos.DrawLine(transform.position + (Vector3)rayDownOffset * (isFaceRight ? 1 : -1), transform.position + (Vector3)rayDownOffset * (isFaceRight ? 1 : -1) + new Vector3(0, -0.5f, 0));
+        Gizmos.DrawLine(tf.position + (Vector3)rayRightOffset, tf.position + (Vector3)rayRightOffset + new Vector3(0.5f * (isFaceRight ? 1 : -1), 0, 0));
+        Gizmos.DrawLine(tf.position + (Vector3)rayDownOffset * (isFaceRight ? 1 : -1), tf.position + (Vector3)rayDownOffset * (isFaceRight ? 1 : -1) + new Vector3(0, -0.5f, 0));
     }
 
 #endregion

@@ -325,6 +325,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b603b61b9bfc7324f95e175b7c4dfb6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tf: {fileID: 422927392}
   type: 0
   _color: {r: 0, g: 1, b: 0, a: 1}
   width: 0.25
@@ -776,6 +777,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b603b61b9bfc7324f95e175b7c4dfb6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tf: {fileID: 831629555}
   type: 0
   _color: {r: 1, g: 0, b: 0, a: 1}
   width: 0.3
@@ -858,7 +860,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88021fdaba8041a4c959524a735c2214, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 910239147}
+  tf: {fileID: 910239150}
   cl: {fileID: 910239153}
   animator: {fileID: 2062787986}
   groundLayer:
@@ -1511,6 +1513,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b603b61b9bfc7324f95e175b7c4dfb6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tf: {fileID: 2005456739}
   type: 1
   _color: {r: 0, g: 1, b: 1, a: 1}
   width: 0.08
@@ -1560,6 +1563,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b603b61b9bfc7324f95e175b7c4dfb6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tf: {fileID: 2052807505}
   type: 0
   _color: {r: 1, g: 1, b: 0, a: 1}
   width: 0.05

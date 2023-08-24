@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CheckBox : MonoBehaviour
@@ -11,6 +8,7 @@ public class CheckBox : MonoBehaviour
         Circle
     }
 
+    [SerializeField] private Transform tf;
     [SerializeField] private Type type = Type.Rectangle;
     [SerializeField] private Color _color = Color.red;
     [SerializeField] private float width, height;
@@ -25,9 +23,9 @@ public class CheckBox : MonoBehaviour
         //     return;
         Gizmos.color = _color;
         if (type == Type.Circle)
-            Gizmos.DrawWireSphere(transform.position, radius);
+            Gizmos.DrawWireSphere(tf.position, radius);
         else
-            Gizmos.DrawWireCube(transform.position, new Vector3(width, height, 0));
+            Gizmos.DrawWireCube(tf.position, new Vector3(width, height, 0));
     }
 
     public bool Detect(LayerMask layer)
@@ -35,8 +33,8 @@ public class CheckBox : MonoBehaviour
         // if (useTrigger2D)
         //     return triggerEnter;
         if (type == Type.Circle)
-            return Physics2D.OverlapCircle(transform.position, radius, layer);
-        return Physics2D.OverlapBox(transform.position, new Vector2(width, height), 0, layer);
+            return Physics2D.OverlapCircle(tf.position, radius, layer);
+        return Physics2D.OverlapBox(tf.position, new Vector2(width, height), 0, layer);
     }
 
     // void OnTriggerEnter2D(Collider2D collision)
