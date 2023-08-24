@@ -5,7 +5,9 @@ using UnityEngine;
 public class AnimateController : MonoBehaviour
 {
     [SerializeField] private Animator animator;
+    [SerializeField] private PlayerController player;
     private bool startJumpAnimation = false;
+    private bool startLedgeGrabAnimation = false;
 
     public void SetJumpAnimation()
     {
@@ -15,11 +17,25 @@ public class AnimateController : MonoBehaviour
     {
         startJumpAnimation = false;
     }
-    public void SetAnimation(bool onGround, float xSpeed, float yVeloc)
+    public void SetAnimation()
     {
-        animator.SetBool("onGround", onGround);
-        animator.SetFloat("xSpeed", xSpeed);
-        animator.SetFloat("yVeloc", yVeloc);
+        animator.SetBool("onGround", player.onGround);
+        animator.SetFloat("xSpeed", Mathf.Abs(player.rb.velocity.x));
+        animator.SetFloat("yVeloc", player.rb.velocity.y);
         animator.SetBool("startJump", startJumpAnimation);
+        animator.SetBool("startLedgeGrab", startLedgeGrabAnimation);
+        animator.SetBool("ledgeClimbing", player.ledgeClimbing);
+    }
+    public void SetLedgeGrabAnimation()
+    {
+        startLedgeGrabAnimation = true;
+    }
+    public void ResetLedgeGrabAnimation()
+    {
+        startLedgeGrabAnimation = false;
+    }
+    public void LedgeClimbEnd()
+    {
+        player.LedgeClimbOver();
     }
 }
