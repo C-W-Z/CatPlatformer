@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour
 
         #region Player Movements
 
-        if (ledgeGrabbing)
+        if (ledgeGrabbing || ledgeClimbing)
             goto ledge_grabbing;
 
         Run();
@@ -58,20 +58,20 @@ public class PlayerController : MonoBehaviour
 
         #endregion
 
-        SetGravity();
-        CheckFaceDir();
-
 ledge_grabbing:
         if (ledgeGrabbing || ledgeClimbing)
         {
             cl.isTrigger = true;
             tf.position = (Vector3)ledgeClimbPosBefore;
             rb.velocity = Vector2.zero;
-            rb.gravityScale = 0;
+            // rb.gravityScale = 0;
 
             if (jumpDown && ledgeGrabbing)
                 LedgeClimb();
         }
+
+        SetGravity();
+        CheckFaceDir();
 
         animator.SetAnimation();
     }
@@ -93,13 +93,14 @@ ledge_grabbing:
 #region Get Input
 
     private float inputH, inputV;
-    private bool jumpDown, jumpUp;
+    private bool jumpDown, jumpPress, jumpUp;
 
     private void GetInput()
     {
         inputH = Input.GetAxis("Horizontal");
         inputV = Input.GetAxis("Vertical");
         jumpDown = Input.GetKeyDown(KeyCode.Space);
+        jumpPress = Input.GetKey(KeyCode.Space);
         jumpUp = Input.GetKeyUp(KeyCode.Space);
     }
 
@@ -151,7 +152,7 @@ ledge_grabbing:
 
     private void CheckFaceDir()
     {
-        if (inputH == 0)
+        if (inputH == 0 || ledgeGrabbing || ledgeClimbing)
             return;
         if (wallDetected && ((inputH > 0 && isFaceRight) || (inputH < 0 && !isFaceRight)))
             return;
