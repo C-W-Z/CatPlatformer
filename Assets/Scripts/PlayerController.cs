@@ -92,16 +92,18 @@ ledge_grabbing:
 
 #region Get Input
 
-    private float inputH, inputV;
+    private float inputH, inputV, rawInputH, rawInputV;
     private bool jumpDown, jumpPress, jumpUp;
 
     private void GetInput()
     {
         inputH = Input.GetAxis("Horizontal");
         inputV = Input.GetAxis("Vertical");
-        jumpDown = Input.GetKeyDown(KeyCode.Space);
-        jumpPress = Input.GetKey(KeyCode.Space);
-        jumpUp = Input.GetKeyUp(KeyCode.Space);
+        rawInputH = Input.GetAxisRaw("Horizontal");
+        rawInputV = Input.GetAxisRaw("Vertical");
+        jumpDown = Input.GetButtonDown("Jump");
+        jumpPress = Input.GetButton("Jump");
+        jumpUp = Input.GetButtonUp("Jump");
     }
 
 #endregion
@@ -130,8 +132,9 @@ ledge_grabbing:
 #region Move
 
     [Header("Move")]
-    [SerializeField] private float maxMoveSpeed = 1.6f;
-    [SerializeField] private float moveAcceleration = 1.2f, moveDecceleration = 1.6f;
+    [SerializeField][Min(0f)] private float maxMoveSpeed = 1.6f;
+    [SerializeField][Min(0f)] private float moveAcceleration = 1.2f, moveDecceleration = 1.6f;
+    [SerializeField][Min(0f)] private float frictionAmount = 0.5f;
     [Space(10)]
     [SerializeField][Min(1f)] private float jumpAirTimeMoveSpeedMult = 1.5f;
     private bool isFaceRight = true;
@@ -139,7 +142,8 @@ ledge_grabbing:
     private void Run()
     {
         float targetSpeed = inputH * maxMoveSpeed;
-        float accelerate = (Mathf.Abs(inputH) > 0.01f) ? moveAcceleration : moveDecceleration;
+        float accelerate = (Mathf.Abs(rawInputH) > 0) ? moveAcceleration : moveDecceleration;
+        // faster when air time
         if (jumpAirTiming)
         {
             targetSpeed *= jumpAirTimeMoveSpeedMult;
@@ -147,14 +151,18 @@ ledge_grabbing:
         }
         float speedDiff = targetSpeed - rb.velocity.x;
         float movement = speedDiff * accelerate;
-        rb.AddForce(movement * Vector2.right, ForceMode2D.Force);
+        // friction
+        float friction = 0;
+        if (lastOnGroundTimer > 0 && rawInputH == 0)
+            friction = Mathf.Min(Mathf.Abs(rb.velocity.x), frictionAmount) * Mathf.Sign(rb.velocity.x);
+        rb.AddForce((movement - friction) * Vector2.right, ForceMode2D.Force);
     }
 
     private void CheckFaceDir()
     {
-        if (inputH == 0 || ledgeGrabbing || ledgeClimbing)
+        if (rawInputH == 0 || ledgeGrabbing || ledgeClimbing)
             return;
-        if (wallDetected && ((inputH > 0 && isFaceRight) || (inputH < 0 && !isFaceRight)))
+        if (wallDetected && ((rawInputH > 0 && isFaceRight) || (rawInputH < 0 && !isFaceRight)))
             return;
         if ((rb.velocity.x > 0 && !isFaceRight) ||
             (rb.velocity.x < 0 && isFaceRight))
@@ -171,7 +179,7 @@ ledge_grabbing:
     [Header("Jump & Fall")]
     [SerializeField] private float timeBeforeJump = 0.06f;
     [SerializeField] private float jumpForce = 4f;
-    [SerializeField][Range(0f, 0.5f)] private float coyoteTime = 0.1f;
+    [SerializeField][Range(0f, 0.5f)] private float coyoteTime = 0.15f;
     [SerializeField][Range(0f, 0.5f)] private float jumpBufferTime = 0.1f; // jump input buffer
     [Space(10)]
     [SerializeField] private float jumpAirTimeYSpeed = 0.5f;

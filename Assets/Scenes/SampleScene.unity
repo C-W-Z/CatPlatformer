@@ -827,7 +827,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!4 &910239150
 Transform:
@@ -874,10 +874,11 @@ MonoBehaviour:
   maxMoveSpeed: 1.6
   moveAcceleration: 1.2
   moveDecceleration: 1.6
+  frictionAmount: 0.5
   jumpAirTimeMoveSpeedMult: 1.5
   timeBeforeJump: 0.06
   jumpForce: 4
-  coyoteTime: 0.5
+  coyoteTime: 0.15
   jumpBufferTime: 0.1
   jumpAirTimeYSpeed: 0.5
   jumpAirTimeGravityMult: 0.3
