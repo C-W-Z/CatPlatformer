@@ -1396,6 +1396,7 @@ MonoBehaviour:
   fallGravityMult: 1.5
   maxSlideSpeed: 1.2
   slideGravityMult: 0.5
+  delayForLedgeGrab: 0.5
   offsetBefore: {x: -0.063, y: 0.22}
   offsetAfter: {x: 0.35, y: 0.4}
   defaultOffsetBefore: {x: 0.146, y: 0.1}

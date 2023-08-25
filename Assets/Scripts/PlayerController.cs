@@ -202,7 +202,7 @@ ledge_grabbing:
     {
         foreach (var ray in wallRays)
         {
-            float X = ray.GetHitPoint(groundLayer, tf.position, isFaceRight ? 1 : -1).x;
+            float X = ray.GetHitPoint(groundLayer, tf.position).x;
             if (X != tf.position.x)
                 return X;
         }
@@ -281,6 +281,10 @@ ledge_grabbing:
     {
         tf.localScale = new Vector2(-tf.localScale.x, tf.localScale.y);
         isFaceRight = !isFaceRight;
+        foreach (var ray in wallRays)
+            ray.FlipDirX();
+        // foreach (var ray in platformRays)
+        //     ray.FlipDirX();
     }
 
 #endregion
@@ -481,6 +485,7 @@ ledge_grabbing:
         isWallGrabbing = false;
         isWallClimbing = false;
         isJumping = false;
+        isRunning = false;
 
         rb.velocity = Vector2.zero;
         rb.AddForce(force, ForceMode2D.Impulse);

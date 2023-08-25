@@ -16,14 +16,9 @@ public class CheckBox : MonoBehaviour
     [SerializeField] private float radius;
     [SerializeField] private Vector2 direction;
     [SerializeField] private float distance = 1f;
-    // [SerializeField] private bool useTrigger2D = false;
-    // [SerializeField] private string layerName;
-    // private bool triggerEnter = false;
 
     void OnDrawGizmos()
     {
-        // if (useTrigger2D)
-        //     return;
         Gizmos.color = _color;
         switch (type)
         {
@@ -39,47 +34,30 @@ public class CheckBox : MonoBehaviour
         }
     }
 
-    public bool Detect(LayerMask layer, int dirScale = 1)
+    public bool Detect(LayerMask layer)
     {
-        // if (useTrigger2D)
-        //     return triggerEnter;
-        switch (type)
+        return type switch
         {
-            case Type.Rectangle:
-                return Physics2D.OverlapBox(tf.position, new Vector2(width, height), 0, layer);
-            case Type.Circle:
-                return Physics2D.OverlapCircle(tf.position, radius, layer);
-            case Type.Ray:
-                return (bool)Physics2D.Raycast(tf.position, dirScale * direction, distance, layer);
-            default:
-                return false;
-        }
+            Type.Rectangle => (bool)Physics2D.OverlapBox(tf.position, new Vector2(width, height), 0, layer),
+            Type.Circle => (bool)Physics2D.OverlapCircle(tf.position, radius, layer),
+            Type.Ray => (bool)Physics2D.Raycast(tf.position, direction, distance, layer),
+            _ => false
+        };
     }
 
-    public Vector2 GetHitPoint(LayerMask layer, Vector2 defaultPos, int dirScale = 1)
+    public Vector2 GetHitPoint(LayerMask layer, Vector2 defaultPos)
     {
         if (type != Type.Ray)
             return defaultPos;
-        RaycastHit2D hit = Physics2D.Raycast(tf.position, dirScale * direction, distance, layer);
+        RaycastHit2D hit = Physics2D.Raycast(tf.position, direction, distance, layer);
         if (hit.collider != null)
             return hit.point;
         Debug.Log("no hit");
         return defaultPos;
     }
 
-    // void OnTriggerEnter2D(Collider2D collision)
-    // {
-    //     if (!useTrigger2D)
-    //         return;
-    //     if (collision.gameObject.layer == LayerMask.NameToLayer(layerName))
-    //         triggerEnter = true;
-    // }
-
-    // void OnTriggerExit2D(Collider2D collision)
-    // {
-    //     if (!useTrigger2D)
-    //         return;
-    //     if (collision.gameObject.layer == LayerMask.NameToLayer(layerName))
-    //         triggerEnter = false;
-    // }
+    public void FlipDirX()
+    {
+        direction.x = -direction.x;
+    }
 }
