@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Collider2D cl; // normal collider
     [SerializeField] private Collider2D cl_s; // sneak collider
-    [SerializeField] private AnimateController animator;
+    [SerializeField] private PlayerAnimator animator;
     public Rigidbody2D RB => rb;
 
 #region Mono Behaviour
