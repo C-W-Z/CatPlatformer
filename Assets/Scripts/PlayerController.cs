@@ -6,7 +6,8 @@ public class PlayerController : MonoBehaviour
     [Header("Components")]
     [SerializeField] private Transform tf;
     [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private Collider2D cl;
+    [SerializeField] private Collider2D cl; // normal collider
+    [SerializeField] private Collider2D cl_s; // sneak collider
     [SerializeField] private AnimateController animator;
     public Rigidbody2D RB => rb;
 
@@ -15,6 +16,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         cl.isTrigger = false;
+        cl_s.enabled = false;
         rb.gravityScale = gravityScale;
         isFaceRight = true;
         isJumping = false;
@@ -95,7 +97,7 @@ ledge_grabbing:
     private bool moveDown, canCheckDoubleMoveDown = true;
     private int moveDownCount = 0;
     [Header("Input")]
-    [SerializeField] private float doubleMoveDownCheckTime = 0.5f;
+    [SerializeField][Range(0f, 1f)] private float doubleMoveDownCheckTime = 0.5f;
     private bool jumpDown, jumpPress, jumpUp;
 
     private void GetInput()
@@ -167,7 +169,7 @@ ledge_grabbing:
 #region Move
 
     [Header("Move")]
-    [SerializeField][Min(0f)] private float maxWalkSpeed = 1.9f;
+    [SerializeField][Min(0f)] private float maxWalkSpeed = 1.6f;
     [SerializeField][Min(0f)] private float maxRunSpeed = 2.5f;
     private bool isRunning = false;
     [SerializeField][Min(0f)] private float moveAcceleration = 1.2f, moveDecceleration = 1.6f;
