@@ -20,27 +20,27 @@ public class PlayerAnimator : MonoBehaviour
     }
     public void SetAnimation()
     {
-        animator.SetBool("onGround", player.onGround);
+        animator.SetBool("onGround", player.OnGround);
         animator.SetFloat("xSpeed", Mathf.Abs(player.RB.velocity.x));
         animator.SetFloat("yVeloc", player.RB.velocity.y);
         animator.SetBool("startJump", startJumpAnimation);
         animator.SetBool("startLedgeGrab", startLedgeGrabAnimation);
-        animator.SetBool("ledgeClimbing", player.ledgeClimbing);
-        animator.SetBool("wallGrabbing", player.isWallGrabbing);
-        animator.SetBool("wallClimbing", player.isWallClimbing);
-        animator.SetBool("wallJumping", player.isWallJumping);
-        animator.SetBool("onWall", player.onWall);
+        animator.SetBool("ledgeClimbing", player.LedgeClimbing);
+        animator.SetBool("wallGrabbing", player.IsWallGrabbing);
+        animator.SetBool("wallClimbing", player.IsWallClimbing);
+        animator.SetBool("wallJumping", player.IsWallJumping);
+        animator.SetBool("onWall", player.OnWall);
 
         if (startJumpAnimation)
             Invoke(nameof(ResetJumpAnimation), resetDelayTime);
         if (startLedgeGrabAnimation)
             Invoke(nameof(ResetLedgeGrabAnimation), resetDelayTime);
 
-        if (player.isWallClimbing && !sr.flipY)
+        if (player.IsWallClimbing && !sr.flipY)
             tf.localPosition = wallClimbUpPos;
-        else if (player.isWallClimbing && sr.flipY)
+        else if (player.IsWallClimbing && sr.flipY)
             tf.localPosition = wallClimbDownPos;
-        else if (player.isWallGrabbing)
+        else if (player.IsWallGrabbing)
             tf.localPosition = wallGrabPos;
         else
             tf.localPosition = normalPos;
