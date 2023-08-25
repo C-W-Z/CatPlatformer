@@ -15,6 +15,7 @@ public class CheckBox : MonoBehaviour
     [SerializeField] private float width, height;
     [SerializeField] private float radius;
     [SerializeField] private Vector2 direction;
+    [SerializeField] private float distance = 1f;
     // [SerializeField] private bool useTrigger2D = false;
     // [SerializeField] private string layerName;
     // private bool triggerEnter = false;
@@ -33,12 +34,12 @@ public class CheckBox : MonoBehaviour
                 Gizmos.DrawWireSphere(tf.position, radius);
                 break;
             case Type.Ray:
-                Gizmos.DrawRay(tf.position, direction);
+                Gizmos.DrawLine(tf.position, tf.position + (Vector3)(direction * distance));
                 break;
         }
     }
 
-    public bool Detect(LayerMask layer)
+    public bool Detect(LayerMask layer, int dirScale = 1)
     {
         // if (useTrigger2D)
         //     return triggerEnter;
@@ -49,17 +50,17 @@ public class CheckBox : MonoBehaviour
             case Type.Circle:
                 return Physics2D.OverlapCircle(tf.position, radius, layer);
             case Type.Ray:
-                return (bool)Physics2D.Raycast(tf.position, direction);
+                return (bool)Physics2D.Raycast(tf.position, dirScale * direction, distance, layer);
             default:
                 return false;
         }
     }
 
-    public Vector2 GetHitPoint(Vector2 defaultPos)
+    public Vector2 GetHitPoint(LayerMask layer, Vector2 defaultPos, int dirScale = 1)
     {
         if (type != Type.Ray)
             return defaultPos;
-        RaycastHit2D hit = Physics2D.Raycast(tf.position, direction);
+        RaycastHit2D hit = Physics2D.Raycast(tf.position, dirScale * direction, distance, layer);
         if (hit.collider != null)
             return hit.point;
         Debug.Log("no hit");

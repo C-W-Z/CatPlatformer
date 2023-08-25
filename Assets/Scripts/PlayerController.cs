@@ -279,7 +279,7 @@ ledge_grabbing:
 #region Ledge
 
     [Header("Ledge Info")]
-    [SerializeField] private Vector2 offsetBefore = new(0.14f, 0.22f);
+    [SerializeField] private Vector2 offsetBefore = new(0.063f, 0.22f);
     [SerializeField] private Vector2 offsetAfter = new(0.35f, 0.4f);
     private Vector2 ledgeClimbPosBefore;
     private Vector2 ledgeClimbPosAfter;
@@ -291,8 +291,8 @@ ledge_grabbing:
     {
         // get corner position
         Vector2 cornerPos = tf.position;
-        cornerPos.x = ledgeRayFront.GetHitPoint(cornerPos).x;
-        cornerPos.y = ledgeRayDown.GetHitPoint(cornerPos).y;
+        cornerPos.x = ledgeRayFront.GetHitPoint(groundLayer, cornerPos, isFaceRight ? 1 : -1).x;
+        cornerPos.y = ledgeRayDown.GetHitPoint(groundLayer, cornerPos).y;
         // set ledge grab and climb position
         ledgeClimbPosBefore = cornerPos + new Vector2(offsetBefore.x * (isFaceRight ? 1 : -1), offsetBefore.y);
         ledgeClimbPosAfter = cornerPos + new Vector2(offsetAfter.x * (isFaceRight ? 1 : -1), offsetAfter.y);
