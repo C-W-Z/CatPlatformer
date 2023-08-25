@@ -65,8 +65,16 @@ public class PlayerController : MonoBehaviour
             StartCoroutine(Jump());
         if (jumpUp && (isJumping || isWallJumping) && rb.velocity.y > 0)
             JumpCut();
-        if (!isWallGrabbing && onWall && wallPress && !isWallJumping)
-            StartCoroutine(StartWallGrab());
+        if (!isWallGrabbing && wallPress && !isWallJumping)
+        {
+            if (onWall)
+                StartCoroutine(StartWallGrab());
+            else if (backWallDetected)
+            {
+                Turn();
+                StartCoroutine(StartWallGrab());
+            }
+        }
         if (isWallGrabbing && !isWallJumping)
             WallClimb();
         if (isWallGrabbing && jumpDown && !isJumping && !isWallJumping)
@@ -181,6 +189,7 @@ ledge_grabbing:
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private CheckBox groundCheck;
     [SerializeField] private CheckBox wallCheck;
+    [SerializeField] private CheckBox backWallCheck;
     [SerializeField] private CheckBox ledgeCheck;
     [SerializeField] private CheckBox ledgeCheckTop;
     [SerializeField] private List<CheckBox> wallRays;
@@ -190,11 +199,13 @@ ledge_grabbing:
     public bool onGround;
     public bool onWall;
     private bool ledgeDetected;
+    private bool backWallDetected;
 
     private void CheckSurrounding()
     {
         onGround = groundCheck.Detect(groundLayer);
         onWall = wallCheck.Detect(groundLayer);
+        backWallDetected = backWallCheck.Detect(groundLayer);
         ledgeDetected = (ledgeCheck.Detect(groundLayer) && !ledgeCheckTop.Detect(groundLayer)) || ((isWallGrabbing || isWallClimbing) && !wallToLedgeCheck.Detect(groundLayer) && wallBottomCheck.Detect(groundLayer));
     }
 
@@ -248,8 +259,8 @@ ledge_grabbing:
     {
         float targetSpeed = inputH * (isRunning ? maxRunSpeed : maxWalkSpeed);
         float accelerate = (rawInputH != 0) ? moveAcceleration : moveDecceleration;
-        if (isWallJumping && rawInputH != 0)
-            accelerate = wallJumpMoveDecceleration;
+        if (isWallJumping)
+            accelerate = (rawInputH != 0) ? wallJumpMoveAcceleration : wallJumpMoveDecceleration;
         // faster when air time
         if (jumpAirTiming)
         {
@@ -422,8 +433,9 @@ ledge_grabbing:
     [Header("Wall")]
     [SerializeField] private float wallClimbSpeed = 1.5f;
     [SerializeField] private float timeBeforeWallJump = 0.05f;
-    [SerializeField] private Vector2 wallJumpPower = new(9f, 4f);
-    [SerializeField] private float wallJumpGravityMult = 1.4f;
+    [SerializeField] private Vector2 wallJumpPower = new(9.8f, 4f);
+    [SerializeField] private float wallJumpGravityMult = 1.35f;
+    [SerializeField] private float wallJumpMoveAcceleration = 0.5f;
     [SerializeField] private float wallJumpMoveDecceleration = 0.6f;
     public bool isWallGrabbing = false;
     public bool isWallClimbing = false;

@@ -1110,6 +1110,7 @@ Transform:
   m_Children:
   - {fileID: 831629555}
   - {fileID: 2052807505}
+  - {fileID: 1790410453}
   - {fileID: 2005456739}
   - {fileID: 1485771944}
   - {fileID: 1406555049}
@@ -1359,6 +1360,7 @@ MonoBehaviour:
     m_Bits: 2048
   groundCheck: {fileID: 831629556}
   wallCheck: {fileID: 2052807506}
+  backWallCheck: {fileID: 1790410454}
   ledgeCheck: {fileID: 2005456740}
   ledgeCheckTop: {fileID: 422927393}
   wallRays:
@@ -1403,8 +1405,9 @@ MonoBehaviour:
   defaultOffsetAfter: {x: 0.2, y: 0.2}
   wallClimbSpeed: 1.5
   timeBeforeWallJump: 0.05
-  wallJumpPower: {x: 9, y: 4}
-  wallJumpGravityMult: 1.4
+  wallJumpPower: {x: 9.8, y: 4}
+  wallJumpGravityMult: 1.35
+  wallJumpMoveAcceleration: 0.5
   wallJumpMoveDecceleration: 0.6
   isWallGrabbing: 0
   isWallClimbing: 0
@@ -2033,7 +2036,7 @@ Transform:
   m_GameObject: {fileID: 1591038086}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.33, y: 0.22, z: 0}
+  m_LocalPosition: {x: 4.252, y: 0.235, z: 0}
   m_LocalScale: {x: 0.25, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2308,6 +2311,58 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
+--- !u!1 &1790410452
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1790410453}
+  - component: {fileID: 1790410454}
+  m_Layer: 10
+  m_Name: Back Wall Check
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1790410453
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1790410452}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.21, y: -0.25, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 720838259}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1790410454
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1790410452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b603b61b9bfc7324f95e175b7c4dfb6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tf: {fileID: 1790410453}
+  type: 0
+  _color: {r: 1, g: 1, b: 0, a: 1}
+  width: 0.05
+  height: 0.2
+  radius: 0
+  direction: {x: 0, y: 0}
+  distance: 1
 --- !u!1 &1837681949
 GameObject:
   m_ObjectHideFlags: 0
@@ -3014,7 +3069,7 @@ SpriteRenderer:
   m_SortingLayerID: 839224745
   m_SortingLayer: 2
   m_SortingOrder: 100
-  m_Sprite: {fileID: 2115912801, guid: 2dbe86d3c9178194cb40d7bb22ec86bd, type: 3}
+  m_Sprite: {fileID: -1830126329, guid: bf6e7702c33bdf3478d50dcf4dd393f5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
