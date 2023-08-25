@@ -190,7 +190,7 @@ ledge_grabbing:
     {
         onGround = groundCheck.Detect(groundLayer);
         onWall = wallCheck.Detect(groundLayer);
-        ledgeDetected = (ledgeCheck.Detect(groundLayer) && !ledgeCheckTop.Detect(groundLayer)) || ((isWallGrabbing || isWallClimbing) && !wallToLedgeCheck.Detect(groundLayer) && !wallBottomCheck.Detect(groundLayer));
+        ledgeDetected = (ledgeCheck.Detect(groundLayer) && !ledgeCheckTop.Detect(groundLayer)) || ((isWallGrabbing || isWallClimbing) && !wallToLedgeCheck.Detect(groundLayer) && wallBottomCheck.Detect(groundLayer));
     }
 
     private float GetWallX()
@@ -410,11 +410,11 @@ ledge_grabbing:
 #region Wall
 
     [Header("Wall")]
-    [SerializeField] private float wallClimbSpeed = 0.8f;
-    [SerializeField] private float timeBeforeWallJump = 0.06f;
-    [SerializeField] private Vector2 wallJumpPower = new(6f, 4f);
-    [SerializeField] private float wallJumpGravityMult = 0.8f;
-    [SerializeField] private float wallJumpMoveDecceleration = 0.8f;
+    [SerializeField] private float wallClimbSpeed = 1.5f;
+    [SerializeField] private float timeBeforeWallJump = 0.05f;
+    [SerializeField] private Vector2 wallJumpPower = new(9f, 4f);
+    [SerializeField] private float wallJumpGravityMult = 1.4f;
+    [SerializeField] private float wallJumpMoveDecceleration = 0.6f;
     public bool isWallGrabbing = false;
     public bool isWallClimbing = false;
     public bool isWallJumping = false;
