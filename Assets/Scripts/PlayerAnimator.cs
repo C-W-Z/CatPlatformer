@@ -16,6 +16,9 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetBool("startJump", startJumpAnimation);
         animator.SetBool("startLedgeGrab", startLedgeGrabAnimation);
         animator.SetBool("ledgeClimbing", player.ledgeClimbing);
+        animator.SetBool("wallGrabbing", player.isWallGrabbing);
+        animator.SetBool("wallClimbing", player.isWallClimbing);
+        animator.SetBool("wallJumping", player.isWallJumping);
 
         if (startJumpAnimation)
             Invoke(nameof(ResetJumpAnimation), resetDelayTime);
