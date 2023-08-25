@@ -66,7 +66,7 @@ public class PlayerController : MonoBehaviour
         if (jumpUp && (isJumping || isWallJumping) && rb.velocity.y > 0)
             JumpCut();
         if (!isWallGrabbing && onWall && wallPress && !isWallJumping)
-            StartWallGrab();
+            StartCoroutine(StartWallGrab());
         if (isWallGrabbing && !isWallJumping)
             WallClimb();
         if (isWallGrabbing && jumpDown && !isJumping && !isWallJumping)
@@ -87,8 +87,13 @@ ledge_grabbing:
             rb.velocity = Vector2.zero;
             // rb.gravityScale = 0;
 
-            if (jumpDown && ledgeGrabbing)
-                LedgeClimb();
+            if (ledgeGrabbing)
+            {
+                if (jumpDown)
+                    LedgeClimb();
+                if (rawInputV < 0)
+                    StartCoroutine(StartWallGrab());
+            }
         }
 
         SetGravity();
@@ -358,6 +363,7 @@ ledge_grabbing:
 #region Ledge
 
     [Header("Ledge Info")]
+    [SerializeField] private float delayForLedgeGrab = 0.5f;
     [SerializeField] private Vector2 offsetBefore = new(0.063f, 0.22f);
     [SerializeField] private Vector2 offsetAfter = new(0.35f, 0.4f);
     [SerializeField] private Vector2 defaultOffsetBefore = new(0.146f, 0.22f);
@@ -421,7 +427,7 @@ ledge_grabbing:
     [SerializeField] private Vector2 wallGrabOffset = new(-0.2f, 0f);
     [SerializeField] private Vector2 defaultWallGrabOffset = new(-0.25f, 0f);
 
-    private void StartWallGrab()
+    private IEnumerator StartWallGrab()
     {
         // get wall grab pos
         Vector2 wallGrabPos = tf.position;
@@ -430,12 +436,25 @@ ledge_grabbing:
             wallGrabPos += defaultWallGrabOffset * (isFaceRight ? 1 : -1);
         else
             wallGrabPos += wallGrabOffset * (isFaceRight ? 1 : -1);
+        
         // start wall grab
         lastOnGroundTimer = 0;
         isWallGrabbing = true;
         isWallJumping = false;
         rb.velocity = Vector2.zero;
         tf.position = wallGrabPos;
+
+        // for back to wall grab from ledge grab
+        cl.isTrigger = false;
+        ledgeGrabbing = false;
+        ledgeClimbing = false;
+
+        if (!canGrabLedge)
+        {
+            yield return new WaitForSeconds(delayForLedgeGrab);
+            canGrabLedge = true;
+        }
+        else yield break;
     }
 
     private void WallClimb()
