@@ -871,13 +871,13 @@ MonoBehaviour:
   wallCheck: {fileID: 2052807506}
   ledgeCheck: {fileID: 2005456740}
   ledgeCheckTop: {fileID: 422927393}
-  maxMoveSpeed: 1.6
+  maxMoveSpeed: 2
   moveAcceleration: 1.2
   moveDecceleration: 1.6
   frictionAmount: 0.5
   jumpAirTimeMoveSpeedMult: 1.5
   timeBeforeJump: 0.06
-  jumpForce: 4
+  jumpForce: 4.5
   coyoteTime: 0.15
   jumpBufferTime: 0.1
   jumpAirTimeYSpeed: 0.5

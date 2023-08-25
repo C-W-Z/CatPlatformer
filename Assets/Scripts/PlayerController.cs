@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour
         if (ledgeGrabbing || ledgeClimbing)
             goto ledge_grabbing;
 
-        Run();
+        Move();
         if (!isJumping && lastOnGroundTimer > 0 && lastPressJumpTimer > 0)
             StartCoroutine(Jump());
         if (jumpUp && isJumping && rb.velocity.y > 0)
@@ -132,14 +132,14 @@ ledge_grabbing:
 #region Move
 
     [Header("Move")]
-    [SerializeField][Min(0f)] private float maxMoveSpeed = 1.6f;
+    [SerializeField][Min(0f)] private float maxMoveSpeed = 2f;
     [SerializeField][Min(0f)] private float moveAcceleration = 1.2f, moveDecceleration = 1.6f;
     [SerializeField][Min(0f)] private float frictionAmount = 0.5f;
     [Space(10)]
     [SerializeField][Min(1f)] private float jumpAirTimeMoveSpeedMult = 1.5f;
     private bool isFaceRight = true;
 
-    private void Run()
+    private void Move()
     {
         float targetSpeed = inputH * maxMoveSpeed;
         float accelerate = (Mathf.Abs(rawInputH) > 0) ? moveAcceleration : moveDecceleration;
@@ -178,7 +178,7 @@ ledge_grabbing:
 
     [Header("Jump & Fall")]
     [SerializeField] private float timeBeforeJump = 0.06f;
-    [SerializeField] private float jumpForce = 4f;
+    [SerializeField] private float jumpForce = 4.5f;
     [SerializeField][Range(0f, 0.5f)] private float coyoteTime = 0.15f;
     [SerializeField][Range(0f, 0.5f)] private float jumpBufferTime = 0.1f; // jump input buffer
     [Space(10)]
