@@ -864,6 +864,7 @@ MonoBehaviour:
   rb: {fileID: 910239147}
   cl: {fileID: 910239153}
   animator: {fileID: 2062787986}
+  doubleMoveDownCheckTime: 0.5
   groundLayer:
     serializedVersion: 2
     m_Bits: 2048
@@ -871,7 +872,8 @@ MonoBehaviour:
   wallCheck: {fileID: 2052807506}
   ledgeCheck: {fileID: 2005456740}
   ledgeCheckTop: {fileID: 422927393}
-  maxMoveSpeed: 2
+  maxWalkSpeed: 1.9
+  maxRunSpeed: 2.5
   moveAcceleration: 1.2
   moveDecceleration: 1.6
   frictionAmount: 0.5

@@ -35,9 +35,6 @@ public class PlayerController : MonoBehaviour
             isJumpCutting = false;
         }
 
-        if (jumpDown)
-            lastPressJumpTimer = jumpBufferTime;
-
         if (onGround && !isJumping)
             lastOnGroundTimer = coyoteTime;
 
@@ -80,10 +77,12 @@ ledge_grabbing:
 
 #region Timer
 
+    private float lastPressMoveTimer; // for walk speed up to run
     private float lastPressJumpTimer; // for jump buffer
     private float lastOnGroundTimer; // for coyote time
     private void TimerUpdate()
     {
+        lastPressMoveTimer -= Time.deltaTime;
         lastPressJumpTimer -=  Time.deltaTime;
         lastOnGroundTimer -= Time.deltaTime;
     }
@@ -93,6 +92,10 @@ ledge_grabbing:
 #region Get Input
 
     private float inputH, inputV, rawInputH, rawInputV;
+    private bool moveDown, canCheckDoubleMoveDown = true;
+    private int moveDownCount = 0;
+    [Header("Input")]
+    [SerializeField] private float doubleMoveDownCheckTime = 0.5f;
     private bool jumpDown, jumpPress, jumpUp;
 
     private void GetInput()
@@ -101,9 +104,41 @@ ledge_grabbing:
         inputV = Input.GetAxis("Vertical");
         rawInputH = Input.GetAxisRaw("Horizontal");
         rawInputV = Input.GetAxisRaw("Vertical");
+        moveDown = Input.GetButtonDown("Horizontal");
         jumpDown = Input.GetButtonDown("Jump");
         jumpPress = Input.GetButton("Jump");
         jumpUp = Input.GetButtonUp("Jump");
+
+        if (moveDown)
+            moveDownCount++;
+
+        if (moveDownCount == 1 && canCheckDoubleMoveDown)
+        {
+            lastPressMoveTimer = doubleMoveDownCheckTime;
+            StartCoroutine(DetectDoubleMoveDown());
+        }
+
+        if (rawInputH == 0)
+            isRunning = false;
+
+        if (jumpDown)
+            lastPressJumpTimer = jumpBufferTime;
+    }
+
+    private IEnumerator DetectDoubleMoveDown()
+    {
+        canCheckDoubleMoveDown = false;
+        while (lastPressMoveTimer > 0)
+        {
+            if (moveDownCount == 2)
+            {
+                isRunning = true;
+                break;
+            }
+            yield return null;
+        }
+        moveDownCount = 0;
+        canCheckDoubleMoveDown = true;
     }
 
 #endregion
@@ -132,7 +167,9 @@ ledge_grabbing:
 #region Move
 
     [Header("Move")]
-    [SerializeField][Min(0f)] private float maxMoveSpeed = 2f;
+    [SerializeField][Min(0f)] private float maxWalkSpeed = 1.9f;
+    [SerializeField][Min(0f)] private float maxRunSpeed = 2.5f;
+    private bool isRunning = false;
     [SerializeField][Min(0f)] private float moveAcceleration = 1.2f, moveDecceleration = 1.6f;
     [SerializeField][Min(0f)] private float frictionAmount = 0.5f;
     [Space(10)]
@@ -141,7 +178,7 @@ ledge_grabbing:
 
     private void Move()
     {
-        float targetSpeed = inputH * maxMoveSpeed;
+        float targetSpeed = inputH * (isRunning ? maxRunSpeed : maxWalkSpeed);
         float accelerate = (Mathf.Abs(rawInputH) > 0) ? moveAcceleration : moveDecceleration;
         // faster when air time
         if (jumpAirTiming)
