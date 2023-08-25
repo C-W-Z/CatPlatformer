@@ -415,6 +415,7 @@ MonoBehaviour:
   width: 0.25
   height: 0.1
   radius: 0
+  direction: {x: 0, y: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -817,6 +818,42 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &720838258
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 720838259}
+  m_Layer: 10
+  m_Name: Detect
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &720838259
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 720838258}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 831629555}
+  - {fileID: 2052807505}
+  - {fileID: 2005456739}
+  - {fileID: 1487833876}
+  - {fileID: 2118901734}
+  m_Father: {fileID: 910239150}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &831629554
 GameObject:
   m_ObjectHideFlags: 0
@@ -842,12 +879,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 831629554}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: -0.4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 910239150}
+  m_Father: {fileID: 720838259}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &831629556
 MonoBehaviour:
@@ -867,6 +904,7 @@ MonoBehaviour:
   width: 0.3
   height: 0.05
   radius: 0
+  direction: {x: 0, y: 0}
 --- !u!1 &910239146
 GameObject:
   m_ObjectHideFlags: 0
@@ -926,9 +964,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2112956363}
-  - {fileID: 831629555}
-  - {fileID: 2052807505}
-  - {fileID: 2005456739}
+  - {fileID: 720838259}
   - {fileID: 1371533142}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -957,6 +993,8 @@ MonoBehaviour:
   wallCheck: {fileID: 2052807506}
   ledgeCheck: {fileID: 2005456740}
   ledgeCheckTop: {fileID: 422927393}
+  ledgeRayFront: {fileID: 1487833877}
+  ledgeRayDown: {fileID: 2118901735}
   maxWalkSpeed: 1.6
   maxRunSpeed: 2.5
   moveAcceleration: 1.2
@@ -974,8 +1012,6 @@ MonoBehaviour:
   fallGravityMult: 1.5
   offsetBefore: {x: 0.14, y: 0.22}
   offsetAfter: {x: 0.35, y: 0.4}
-  rayRightOffset: {x: 0, y: -0.18}
-  rayDownOffset: {x: 0.27, y: 0}
 --- !u!1 &1037190280
 GameObject:
   m_ObjectHideFlags: 0
@@ -1128,6 +1164,57 @@ Transform:
   - {fileID: 1868980326}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1487833875
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1487833876}
+  - component: {fileID: 1487833877}
+  m_Layer: 0
+  m_Name: Ledge Corner Ray Horizontal
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1487833876
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1487833875}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.18, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 720838259}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1487833877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1487833875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b603b61b9bfc7324f95e175b7c4dfb6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tf: {fileID: 1487833876}
+  type: 2
+  _color: {r: 1, g: 0, b: 1, a: 1}
+  width: 0
+  height: 0
+  radius: 0
+  direction: {x: 1, y: 0}
 --- !u!1 &1654884127
 GameObject:
   m_ObjectHideFlags: 0
@@ -1614,13 +1701,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2005456738}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.2, y: -0.113, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.20000005, y: -0.12, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 422927392}
-  m_Father: {fileID: 910239150}
+  m_Father: {fileID: 720838259}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2005456740
 MonoBehaviour:
@@ -1640,6 +1727,7 @@ MonoBehaviour:
   width: 0.08
   height: 0.08
   radius: 0.06
+  direction: {x: 0, y: 0}
 --- !u!1 &2052807504
 GameObject:
   m_ObjectHideFlags: 0
@@ -1665,12 +1753,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2052807504}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.2, y: -0.25, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.20000005, y: -0.25, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 910239150}
+  m_Father: {fileID: 720838259}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2052807506
 MonoBehaviour:
@@ -1690,6 +1778,7 @@ MonoBehaviour:
   width: 0.05
   height: 0.2
   radius: 0
+  direction: {x: 0, y: 0}
 --- !u!1 &2062787982
 GameObject:
   m_ObjectHideFlags: 0
@@ -1845,6 +1934,57 @@ Transform:
   - {fileID: 20558932}
   m_Father: {fileID: 910239150}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2118901733
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2118901734}
+  - component: {fileID: 2118901735}
+  m_Layer: 0
+  m_Name: Ledge Corner Ray Vertical
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2118901734
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2118901733}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.27, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 720838259}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2118901735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2118901733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b603b61b9bfc7324f95e175b7c4dfb6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tf: {fileID: 2118901734}
+  type: 2
+  _color: {r: 1, g: 0, b: 1, a: 1}
+  width: 0
+  height: 0
+  radius: 0
+  direction: {x: 0, y: -1}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
