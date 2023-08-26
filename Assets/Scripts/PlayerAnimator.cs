@@ -27,6 +27,7 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetBool("sneaking", player.IsSneaking);
         animator.SetBool("startJump", _startJumpAnimation);
         animator.SetBool("startLedgeGrab", _startLedgeGrabAnimation);
+        animator.SetBool("ledgeGrabbing", player.IsLedgeGrabbing);
         animator.SetBool("ledgeClimbing", player.IsLedgeClimbing);
         animator.SetBool("wallGrabbing", player.IsWallGrabbing);
         animator.SetBool("wallClimbing", player.IsWallClimbing);

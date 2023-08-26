@@ -65,9 +65,6 @@ public class PlayerController : MonoBehaviour
         if (!stat.Sneaking && !stat.WallGrabbing && sur.OnGround && input.RawV < 0)
             StartSneak();
 
-        if (!stat.WallGrabbing && !stat.WallClimbing)
-            Move();
-
         if (!stat.WallGrabbing && !stat.WallClimbing && !stat.Jumping && !stat.WallJumping && timer.LastOnGround > 0 && timer.LastPressJump > 0)
             StartCoroutine(Jump());
 
@@ -120,6 +117,15 @@ ledge_grabbing:
         CheckFaceDir();
 
         animator.SetAnimation();
+    }
+
+    void FixedUpdate()
+    {
+        if (stat.LedgeGrabbing || stat.LedgeClimbing)
+            return;
+
+        if (!stat.WallGrabbing && !stat.WallClimbing)
+            Move();
     }
 
 #endregion
@@ -319,6 +325,7 @@ ledge_grabbing:
     private Stat stat;
     // for animator access
     public bool IsSneaking => stat.Sneaking;
+    public bool IsLedgeGrabbing => stat.LedgeGrabbing;
     public bool IsLedgeClimbing => stat.LedgeClimbing;
     public bool IsWallGrabbing => stat.WallGrabbing;
     public bool IsWallClimbing => stat.WallClimbing;
@@ -332,13 +339,14 @@ ledge_grabbing:
     [SerializeField][Min(0f)] private float maxWalkSpeed = 1.6f;
     [SerializeField][Min(0f)] private float maxRunSpeed = 2.5f;
     [SerializeField][Min(0f)] private float maxSneakSpeed = 1f;
-    [SerializeField][Min(0f)] private float moveAcceleration = 1.2f, moveDecceleration = 1.6f;
-    [SerializeField][Min(0f)] private float frictionAmount = 0.5f;
+    [SerializeField][Min(0f)] private float moveAcceleration = 12f, moveDecceleration = 16f;
+    [SerializeField][Min(0f)] private float frictionAmount = 1f;
     [Space(10)]
     [SerializeField][Min(1f)] private float jumpAirTimeMoveSpeedMult = 1.5f;
 
     private void Move()
     {
+        // calculate move speed
         float targetSpeed, accelerate;
         if (stat.Running)
             targetSpeed = input.H * maxRunSpeed;
@@ -454,6 +462,7 @@ ledge_grabbing:
     [SerializeField][Min(0f)] private float maxFallSpeed = 5f;
     [SerializeField][Min(1f)] private float fallGravityMult = 1.5f;
     [SerializeField][Min(0f)] private float maxSlideSpeed = 1.5f;
+    [SerializeField][Min(0f)] private float fasterSlideSpeed = 3.5f;
     [SerializeField][Min(0f)] private float slideGravityMult = 0.5f;
     private const float GravityScale = 1;
 
@@ -471,8 +480,11 @@ ledge_grabbing:
             rb.gravityScale = GravityScale * jumpAirTimeGravityMult;
         else
             rb.gravityScale = GravityScale;
+        // faster slide
+        if (sur.OnWall && input.RawV < 0 && !input.WallPress)
+            rb.velocity = new Vector2(rb.velocity.x, -fasterSlideSpeed);
         // limit max fall/slide speed
-        if (!sur.OnWall && rb.velocity.y < -maxFallSpeed)
+        else if (!sur.OnWall && rb.velocity.y < -maxFallSpeed)
             rb.velocity = new Vector2(rb.velocity.x, -maxFallSpeed);
         else if (sur.OnWall && rb.velocity.y < -maxSlideSpeed)
             rb.velocity = new Vector2(rb.velocity.x, -maxSlideSpeed);
@@ -539,10 +551,11 @@ ledge_grabbing:
     [Space(5)]
     [SerializeField][Range(0f, 1f)] private float wallJumpBufferTime = 0.1f;
     [SerializeField] private float timeBeforeWallJump = 0.05f;
-    [SerializeField] private Vector2 wallJumpPower = new(9.5f, 4f);
-    [SerializeField] private float wallJumpGravityMult = 1.35f;
-    [SerializeField] private float wallJumpMoveAcceleration = 0.5f;
-    [SerializeField] private float wallJumpMoveDecceleration = 0.6f;
+    [SerializeField] private Vector2 wallJumpOffset = new(0.03f, 0.01f);
+    [SerializeField] private Vector2 wallJumpPower = new(9f, 4f);
+    [SerializeField] private float wallJumpGravityMult = 1.4f;
+    [SerializeField] private float wallJumpMoveAcceleration = 12f;
+    [SerializeField] private float wallJumpMoveDecceleration = 5.5f;
     // isWallGrabing == isWallCLimbing == true when wall climbing
     [Space(10)]
     [SerializeField] private Vector2 wallGrabOffset = new(-0.2f, 0f);
@@ -595,21 +608,29 @@ ledge_grabbing:
 
     private IEnumerator WallJump()
     {
+        timer.LastPressWallJump = 0;
         timer.LastPressJump = 0;
         timer.LastOnGround = 0;
 
         Vector2 force = new((stat.FaceRight ? -1 : 1) * wallJumpPower.x, wallJumpPower.y);
 
+        tf.position += new Vector3(wallJumpOffset.x * (stat.FaceRight ? -1:1), wallJumpOffset.y, 0);
+        rb.velocity = Vector2.zero;
+
         yield return new WaitForSeconds(timeBeforeWallJump);
-        stat.WallJumping = true;
-        stat.WallGrabbing = false;
-        stat.WallClimbing = false;
+        stat.Sneaking = false;
         stat.Jumping = false;
         stat.Running = false;
-        stat.Sneaking = false;
+        stat.WallGrabbing = false;
+        stat.WallClimbing = false;
+        stat.WallJumping = true;
 
         rb.velocity = Vector2.zero;
         rb.AddForce(force, ForceMode2D.Impulse);
+
+        Debug.Log($"before {rb.velocity}");
+        yield return new WaitForSeconds(0.1f);
+        Debug.Log($"after {rb.velocity}");
     }
 
 #endregion
