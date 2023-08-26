@@ -139,70 +139,6 @@ ledge_grabbing:
 
 #endregion
 
-#region Input
-
-    [System.Serializable]
-    private struct Input {
-        public float H, V, RawH, RawV;
-        public bool MoveDown;
-        public bool JumpDown, JumpUp;
-        public bool WallPress;
-    }
-
-    private Input input;
-    [Header("Input")]
-    [SerializeField][Range(0f, 1f)] private float doubleMoveDownCheckTime = 0.5f;
-    private bool _canCheckDoubleMoveDown = true;
-    private int _moveDownCount = 0;
-
-    private void GetInput()
-    {
-        input.H = UnityEngine.Input.GetAxis("Horizontal");
-        input.V = UnityEngine.Input.GetAxis("Vertical");
-        input.RawH = UnityEngine.Input.GetAxisRaw("Horizontal");
-        input.RawV = UnityEngine.Input.GetAxisRaw("Vertical");
-        input.MoveDown = UnityEngine.Input.GetButtonDown("Horizontal");
-        input.JumpDown = UnityEngine.Input.GetButtonDown("Jump");
-        input.JumpUp = UnityEngine.Input.GetButtonUp("Jump");
-        input.WallPress = UnityEngine.Input.GetButton("Wall");
-
-        if (input.MoveDown)
-            _moveDownCount++;
-
-        if (_moveDownCount == 1 && _canCheckDoubleMoveDown)
-        {
-            timer.LastPressMove = doubleMoveDownCheckTime;
-            StartCoroutine(DetectDoubleMoveDown());
-        }
-
-        if (input.RawH == 0)
-            stat.Running = false;
-
-        if (input.JumpDown)
-            timer.LastPressJump = jumpBufferTime;
-
-        if (input.WallPress && input.JumpDown)
-            timer.LastPressWallJump = wallJumpBufferTime;
-    }
-
-    private IEnumerator DetectDoubleMoveDown()
-    {
-        _canCheckDoubleMoveDown = false;
-        while (timer.LastPressMove > 0)
-        {
-            if (_moveDownCount == 2)
-            {
-                stat.Running = true;
-                break;
-            }
-            yield return null;
-        }
-        _moveDownCount = 0;
-        _canCheckDoubleMoveDown = true;
-    }
-
-#endregion
-
 #region Surrounding
 
     [Header("Surrounding")]
@@ -265,6 +201,70 @@ ledge_grabbing:
     private Vector2 GetLedgeCornerPos()
     {
         return new Vector2(GetWallX(), GetPlatformY());
+    }
+
+#endregion
+
+#region Input
+
+    [System.Serializable]
+    private struct Input {
+        public float H, V, RawH, RawV;
+        public bool MoveDown;
+        public bool JumpDown, JumpUp;
+        public bool WallPress;
+    }
+
+    private Input input;
+    [Header("Input")]
+    [SerializeField][Range(0f, 1f)] private float doubleMoveDownCheckTime = 0.5f;
+    private bool _canCheckDoubleMoveDown = true;
+    private int _moveDownCount = 0;
+
+    private void GetInput()
+    {
+        input.H = UnityEngine.Input.GetAxis("Horizontal");
+        input.V = UnityEngine.Input.GetAxis("Vertical");
+        input.RawH = UnityEngine.Input.GetAxisRaw("Horizontal");
+        input.RawV = UnityEngine.Input.GetAxisRaw("Vertical");
+        input.MoveDown = UnityEngine.Input.GetButtonDown("Horizontal");
+        input.JumpDown = UnityEngine.Input.GetButtonDown("Jump");
+        input.JumpUp = UnityEngine.Input.GetButtonUp("Jump");
+        input.WallPress = UnityEngine.Input.GetButton("Wall");
+
+        if (input.MoveDown)
+            _moveDownCount++;
+
+        if (_moveDownCount == 1 && _canCheckDoubleMoveDown)
+        {
+            timer.LastPressMove = doubleMoveDownCheckTime;
+            StartCoroutine(DetectDoubleMoveDown());
+        }
+
+        if (input.RawH == 0)
+            stat.Running = false;
+
+        if (input.JumpDown)
+            timer.LastPressJump = jumpBufferTime;
+
+        if (input.WallPress && input.JumpDown)
+            timer.LastPressWallJump = wallJumpBufferTime;
+    }
+
+    private IEnumerator DetectDoubleMoveDown()
+    {
+        _canCheckDoubleMoveDown = false;
+        while (timer.LastPressMove > 0)
+        {
+            if (_moveDownCount == 2)
+            {
+                stat.Running = true;
+                break;
+            }
+            yield return null;
+        }
+        _moveDownCount = 0;
+        _canCheckDoubleMoveDown = true;
     }
 
 #endregion
