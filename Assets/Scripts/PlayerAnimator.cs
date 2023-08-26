@@ -25,7 +25,7 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetFloat("yVeloc", player.RB.velocity.y);
         animator.SetBool("startJump", _startJumpAnimation);
         animator.SetBool("startLedgeGrab", _startLedgeGrabAnimation);
-        animator.SetBool("ledgeClimbing", player.LedgeClimbing);
+        animator.SetBool("ledgeClimbing", player.IsLedgeClimbing);
         animator.SetBool("wallGrabbing", player.IsWallGrabbing);
         animator.SetBool("wallClimbing", player.IsWallClimbing);
         animator.SetBool("wallJumping", player.IsWallJumping);

@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Collider2D cl; // normal collider
     [SerializeField] private Collider2D cl_s; // sneak collider
     [SerializeField] private PlayerAnimator animator;
+    // for animator access
     public Rigidbody2D RB => rb;
 
 #region Mono Behaviour
@@ -19,15 +20,7 @@ public class PlayerController : MonoBehaviour
         cl.isTrigger = false;
         cl_s.enabled = false;
         rb.gravityScale = GravityScale;
-        _isFaceRight = true;
-        _isRunning = false;
-        _isJumping = false;
-        _isJumpCutting = false;
-        _ledgeGrabbing = false;
-        LedgeClimbing = false;
-        IsWallGrabbing = false;
-        IsWallClimbing = false;
-        IsWallJumping = false;
+        stat.ResetAll();
     }
 
     void Update()
@@ -38,41 +31,43 @@ public class PlayerController : MonoBehaviour
 
         #region Check States
 
-        if (_isJumping && rb.velocity.y <= 0)
+        if (stat.Jumping && rb.velocity.y <= 0)
         {
-            _isJumping = false;
-            _isJumpCutting = false;
+            stat.Jumping = false;
+            stat.JumpCutting = false;
         }
 
-        if (sur.OnGround && !_isJumping)
-            timer.lastOnGround = coyoteTime;
+        if (sur.OnGround && !stat.Jumping)
+            timer.LastOnGround = coyoteTime;
 
-        if (IsWallGrabbing && (!sur.OnWall || !input.WallPress || _ledgeGrabbing || LedgeClimbing))
+        if (stat.WallGrabbing && (!sur.OnWall || !input.WallPress || stat.LedgeGrabbing || stat.LedgeClimbing))
         {
-            IsWallGrabbing = false;
-            IsWallClimbing = false;
+            stat.WallGrabbing = false;
+            stat.WallClimbing = false;
         }
 
-        if (IsWallJumping && (rb.velocity.x == 0 || rb.velocity.y <= 0))
-            IsWallJumping = false;
+        if (stat.WallJumping && (rb.velocity.x == 0 || rb.velocity.y <= 0))
+            stat.WallJumping = false;
+
+        stat.JumpAirTiming = stat.Jumping && Mathf.Abs(rb.velocity.y) < jumpAirTimeYSpeed;
 
         #endregion
 
         #region Player Movements
 
-        if (_ledgeGrabbing || LedgeClimbing)
+        if (stat.LedgeGrabbing || stat.LedgeClimbing)
             goto ledge_grabbing;
 
-        if (!IsWallGrabbing && !IsWallClimbing)
+        if (!stat.WallGrabbing && !stat.WallClimbing)
             Move();
 
-        if (!IsWallGrabbing && !IsWallClimbing && !_isJumping && !IsWallJumping && timer.lastOnGround > 0 && timer.lastPressJump > 0)
+        if (!stat.WallGrabbing && !stat.WallClimbing && !stat.Jumping && !stat.WallJumping && timer.LastOnGround > 0 && timer.LastPressJump > 0)
             StartCoroutine(Jump());
 
-        if (input.JumpUp && (_isJumping || IsWallJumping) && rb.velocity.y > 0)
+        if (input.JumpUp && (stat.Jumping || stat.WallJumping) && rb.velocity.y > 0)
             JumpCut();
 
-        if (!IsWallGrabbing && input.WallPress && !IsWallJumping)
+        if (!stat.WallGrabbing && input.WallPress && !stat.WallJumping)
         {
             if (sur.OnWall)
                 StartCoroutine(StartWallGrab());
@@ -83,29 +78,29 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (IsWallGrabbing && !IsWallJumping)
+        if (stat.WallGrabbing && !stat.WallJumping)
             WallClimb();
 
-        if (IsWallGrabbing && timer.lastPressWallJump > 0 && !_isJumping && !IsWallJumping)
+        if (stat.WallGrabbing && timer.LastPressWallJump > 0 && !stat.Jumping && !stat.WallJumping)
             StartCoroutine(WallJump());
 
-        if (sur.LedgeDetected && _canGrabLedge)
+        if (sur.LedgeDetected && stat.CanGrabLedge)
             LedgeGrab();
 
         #endregion
 
-        if (IsWallGrabbing && !IsWallClimbing)
+        if (stat.WallGrabbing && !stat.WallClimbing)
             rb.velocity = Vector2.zero;
 
 ledge_grabbing:
-        if (_ledgeGrabbing || LedgeClimbing)
+        if (stat.LedgeGrabbing || stat.LedgeClimbing)
         {
             cl.isTrigger = true;
             tf.position = (Vector3)_ledgeClimbPosBefore;
             rb.velocity = Vector2.zero;
             // rb.gravityScale = 0;
 
-            if (_ledgeGrabbing)
+            if (stat.LedgeGrabbing)
             {
                 if (input.JumpDown)
                     LedgeClimb();
@@ -124,18 +119,19 @@ ledge_grabbing:
 
 #region Timer
 
+    [System.Serializable]
     private struct Timer
     {
-        public float lastPressMove; // for walk speed up to run
-        public float lastPressJump; // for jump buffer
-        public float lastPressWallJump; // for wall jump buffer
-        public float lastOnGround; // for coyote time
+        public float LastPressMove; // for walk speed up to run
+        public float LastPressJump; // for jump buffer
+        public float LastPressWallJump; // for wall jump buffer
+        public float LastOnGround; // for coyote time
         public void Update()
         {
-            lastPressMove -= Time.deltaTime;
-            lastPressJump -= Time.deltaTime;
-            lastPressWallJump -= Time.deltaTime;
-            lastOnGround -= Time.deltaTime;
+            LastPressMove -= Time.deltaTime;
+            LastPressJump -= Time.deltaTime;
+            LastPressWallJump -= Time.deltaTime;
+            LastOnGround -= Time.deltaTime;
         }
     }
 
@@ -143,8 +139,9 @@ ledge_grabbing:
 
 #endregion
 
-#region Get Input
+#region Input
 
+    [System.Serializable]
     private struct Input {
         public float H, V, RawH, RawV;
         public bool MoveDown;
@@ -174,28 +171,28 @@ ledge_grabbing:
 
         if (_moveDownCount == 1 && _canCheckDoubleMoveDown)
         {
-            timer.lastPressMove = doubleMoveDownCheckTime;
+            timer.LastPressMove = doubleMoveDownCheckTime;
             StartCoroutine(DetectDoubleMoveDown());
         }
 
         if (input.RawH == 0)
-            _isRunning = false;
+            stat.Running = false;
 
         if (input.JumpDown)
-            timer.lastPressJump = jumpBufferTime;
+            timer.LastPressJump = jumpBufferTime;
 
         if (input.WallPress && input.JumpDown)
-            timer.lastPressWallJump = wallJumpBufferTime;
+            timer.LastPressWallJump = wallJumpBufferTime;
     }
 
     private IEnumerator DetectDoubleMoveDown()
     {
         _canCheckDoubleMoveDown = false;
-        while (timer.lastPressMove > 0)
+        while (timer.LastPressMove > 0)
         {
             if (_moveDownCount == 2)
             {
-                _isRunning = true;
+                stat.Running = true;
                 break;
             }
             yield return null;
@@ -206,7 +203,7 @@ ledge_grabbing:
 
 #endregion
 
-#region Check Surrounding
+#region Surrounding
 
     [Header("Surrounding")]
     [SerializeField] private LayerMask groundLayer;
@@ -220,6 +217,7 @@ ledge_grabbing:
     [SerializeField] private CheckBox wallToLedgeCheck;
     [SerializeField] private CheckBox wallBottomCheck;
 
+    [System.Serializable]
     private struct Surrounding {
         public bool OnGround;
         public bool OnWall;
@@ -228,6 +226,7 @@ ledge_grabbing:
     }
 
     private Surrounding sur;
+    // for animator access
     public bool OnGround => sur.OnGround;
     public bool OnWall => sur.OnWall;
 
@@ -236,7 +235,7 @@ ledge_grabbing:
         sur.OnGround = groundCheck.Detect(groundLayer);
         sur.OnWall = wallCheck.Detect(groundLayer);
         sur.BackWallDetected = backWallCheck.Detect(groundLayer);
-        sur.LedgeDetected = (ledgeCheck.Detect(groundLayer) && !ledgeCheckTop.Detect(groundLayer)) || ((IsWallGrabbing || IsWallClimbing) && !wallToLedgeCheck.Detect(groundLayer) && wallBottomCheck.Detect(groundLayer));
+        sur.LedgeDetected = (ledgeCheck.Detect(groundLayer) && !ledgeCheckTop.Detect(groundLayer)) || ((stat.WallGrabbing || stat.WallClimbing) && !wallToLedgeCheck.Detect(groundLayer) && wallBottomCheck.Detect(groundLayer));
     }
 
     private float GetWallX()
@@ -270,26 +269,67 @@ ledge_grabbing:
 
 #endregion
 
+#region Stat
+
+    [System.Serializable]
+    private struct Stat
+    {
+        public bool FaceRight;
+        public bool Running;
+        public bool Jumping;
+        public bool JumpAirTiming;
+        public bool JumpCutting;
+        public bool CanGrabLedge;
+        public bool LedgeGrabbing;
+        public bool LedgeClimbing;
+        public bool WallGrabbing;
+        public bool WallClimbing;
+        public bool WallJumping;
+
+        public void ResetAll()
+        {
+            FaceRight = true;
+            CanGrabLedge = true;
+            Running = false;
+            Jumping = false;
+            JumpAirTiming = false;
+            JumpCutting = false;
+            LedgeGrabbing = false;
+            LedgeClimbing = false;
+            WallGrabbing = false;
+            WallClimbing = false;
+            WallJumping = false;
+        }
+    }
+
+    private Stat stat;
+    // for animator access
+    public bool IsLedgeClimbing => stat.LedgeClimbing;
+    public bool IsWallGrabbing => stat.WallGrabbing;
+    public bool IsWallClimbing => stat.WallClimbing;
+    public bool IsWallJumping => stat.WallJumping;
+
+#endregion
+
 #region Move
 
     [Header("Move")]
     [SerializeField][Min(0f)] private float maxWalkSpeed = 1.6f;
     [SerializeField][Min(0f)] private float maxRunSpeed = 2.5f;
-    private bool _isRunning = false;
+    
     [SerializeField][Min(0f)] private float moveAcceleration = 1.2f, moveDecceleration = 1.6f;
     [SerializeField][Min(0f)] private float frictionAmount = 0.5f;
     [Space(10)]
     [SerializeField][Min(1f)] private float jumpAirTimeMoveSpeedMult = 1.5f;
-    private bool _isFaceRight = true;
 
     private void Move()
     {
-        float targetSpeed = input.H * (_isRunning ? maxRunSpeed : maxWalkSpeed);
+        float targetSpeed = input.H * (stat.Running ? maxRunSpeed : maxWalkSpeed);
         float accelerate = (input.RawH != 0) ? moveAcceleration : moveDecceleration;
-        if (IsWallJumping)
+        if (stat.WallJumping)
             accelerate = (input.RawH != 0) ? wallJumpMoveAcceleration : wallJumpMoveDecceleration;
         // faster when air time
-        if (JumpAirTiming)
+        if (stat.JumpAirTiming)
         {
             targetSpeed *= jumpAirTimeMoveSpeedMult;
             accelerate *= jumpAirTimeMoveSpeedMult;
@@ -298,27 +338,27 @@ ledge_grabbing:
         float movement = speedDiff * accelerate;
         // friction
         float friction = 0;
-        if (timer.lastOnGround > 0 && input.RawH == 0)
+        if (timer.LastOnGround > 0 && input.RawH == 0)
             friction = Mathf.Min(Mathf.Abs(rb.velocity.x), frictionAmount) * Mathf.Sign(rb.velocity.x);
         rb.AddForce((movement - friction) * Vector2.right, ForceMode2D.Force);
     }
 
     private void CheckFaceDir()
     {
-        animator.FlipY(IsWallClimbing && rb.velocity.y < 0);
+        animator.FlipY(stat.WallClimbing && rb.velocity.y < 0);
 
-        if (_ledgeGrabbing || LedgeClimbing || IsWallGrabbing || IsWallClimbing)
+        if (stat.LedgeGrabbing || stat.LedgeClimbing || stat.WallGrabbing || stat.WallClimbing)
             return;
-        if (sur.OnWall && ((input.RawH > 0 && _isFaceRight) || (input.RawH < 0 && !_isFaceRight)))
+        if (sur.OnWall && ((input.RawH > 0 && stat.FaceRight) || (input.RawH < 0 && !stat.FaceRight)))
             return;
-        if ((input.RawH < 0 && _isFaceRight) || (input.RawH > 0 && !_isFaceRight))
+        if ((input.RawH < 0 && stat.FaceRight) || (input.RawH > 0 && !stat.FaceRight))
             Turn();
     }
 
     private void Turn()
     {
         tf.localScale = new Vector2(-tf.localScale.x, tf.localScale.y);
-        _isFaceRight = !_isFaceRight;
+        stat.FaceRight = !stat.FaceRight;
         foreach (var ray in wallRays)
             ray.FlipDirX();
         // foreach (var ray in platformRays)
@@ -337,12 +377,10 @@ ledge_grabbing:
     [Space(10)]
     [SerializeField] private float jumpAirTimeYSpeed = 0.5f;
     [SerializeField][Range(0f, 1f)] private float jumpAirTimeGravityMult = 0.3f;
-    private bool _isJumping = false;
-    private bool JumpAirTiming => _isJumping && Mathf.Abs(rb.velocity.y) < jumpAirTimeYSpeed;
 
     private IEnumerator Jump()
     {
-        timer.lastPressJump = 0;
+        timer.LastPressJump = 0;
         // reset (falling) velocity for coyote time 
         rb.velocity = new Vector2(rb.velocity.x, 0);
         // start jump animation
@@ -351,21 +389,20 @@ ledge_grabbing:
         yield return new WaitForSeconds(timeBeforeJump);
         // jump
         rb.AddForce(jumpForce * Vector2.up, ForceMode2D.Impulse);
-        _isJumping = true;
-        timer.lastOnGround = 0;
+        stat.Jumping = true;
+        timer.LastOnGround = 0;
     }
 
     [Space(10)]
     [SerializeField][Range(0f, 1f)] private float jumpCutVelocityMult = 0.5f;
     [SerializeField][Min(1f)] private float jumpCutGravityMult = 1.4f;
-    private bool _isJumpCutting = false;
 
     private void JumpCut()
     {
         if (rb.velocity.y <= 0)
             return;
         rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * jumpCutVelocityMult);
-        _isJumpCutting = true;
+        stat.JumpCutting = true;
     }
 
 #endregion
@@ -381,15 +418,15 @@ ledge_grabbing:
 
     private void SetGravity()
     {
-        if (_ledgeGrabbing || LedgeClimbing || IsWallGrabbing || IsWallClimbing)
+        if (stat.LedgeGrabbing || stat.LedgeClimbing || stat.WallGrabbing || stat.WallClimbing)
             rb.gravityScale = 0;
-        else if (IsWallJumping)
+        else if (stat.WallJumping)
             rb.gravityScale = GravityScale * wallJumpGravityMult;
         else if (rb.velocity.y < 0)
             rb.gravityScale = GravityScale * (sur.OnWall ? slideGravityMult : fallGravityMult);
-        else if (_isJumpCutting)
+        else if (stat.JumpCutting)
             rb.gravityScale = GravityScale * jumpCutGravityMult;
-        else if (JumpAirTiming)
+        else if (stat.JumpAirTiming)
             rb.gravityScale = GravityScale * jumpAirTimeGravityMult;
         else
             rb.gravityScale = GravityScale;
@@ -404,7 +441,7 @@ ledge_grabbing:
 
 #region Ledge
 
-    [Header("Ledge Info")]
+    [Header("Ledge")]
     [SerializeField] private float delayForLedgeGrab = 0.5f;
     [SerializeField] private Vector2 offsetBefore = new(0.063f, 0.22f);
     [SerializeField] private Vector2 offsetAfter = new(0.35f, 0.4f);
@@ -412,36 +449,33 @@ ledge_grabbing:
     [SerializeField] private Vector2 defaultOffsetAfter = new(0.35f, 0.4f);
     private Vector2 _ledgeClimbPosBefore;
     private Vector2 _ledgeClimbPosAfter;
-    private bool _canGrabLedge = true;
-    private bool _ledgeGrabbing = false;
-    public bool LedgeClimbing { get; private set; } = false;
 
     private void LedgeGrab()
     {
         // get corner position
         Vector2 cornerPos = GetLedgeCornerPos();
         // set ledge grab and climb position        
-        _ledgeClimbPosBefore.x = cornerPos.x + ((cornerPos.x == tf.position.x) ? defaultOffsetBefore.x : offsetBefore.x) * (_isFaceRight ? 1 : -1);
+        _ledgeClimbPosBefore.x = cornerPos.x + ((cornerPos.x == tf.position.x) ? defaultOffsetBefore.x : offsetBefore.x) * (stat.FaceRight ? 1 : -1);
         _ledgeClimbPosBefore.y = cornerPos.y + ((cornerPos.y == tf.position.y) ? defaultOffsetBefore.y : offsetBefore.y);
-        _ledgeClimbPosAfter.x = cornerPos.x + ((cornerPos.x == tf.position.x) ? defaultOffsetAfter.x : offsetAfter.x) * (_isFaceRight ? 1 : -1);
+        _ledgeClimbPosAfter.x = cornerPos.x + ((cornerPos.x == tf.position.x) ? defaultOffsetAfter.x : offsetAfter.x) * (stat.FaceRight ? 1 : -1);
         _ledgeClimbPosAfter.y = cornerPos.y + ((cornerPos.y == tf.position.y) ? defaultOffsetAfter.y : offsetAfter.y);
         // grab
-        _canGrabLedge = false;
-        _ledgeGrabbing = true;
-        _isJumping = false;
-        _isJumpCutting = false;
-        _isRunning = false;
-        IsWallClimbing = false;
-        IsWallGrabbing = false;
-        IsWallJumping = false;
+        stat.CanGrabLedge = false;
+        stat.LedgeGrabbing = true;
+        stat.Jumping = false;
+        stat.JumpCutting = false;
+        stat.Running = false;
+        stat.WallClimbing = false;
+        stat.WallGrabbing = false;
+        stat.WallJumping = false;
         // start grab animation
         animator.SetLedgeGrabAnimation();
     }
 
     private void LedgeClimb()
     {
-        _ledgeGrabbing = false;
-        LedgeClimbing = true;
+        stat.LedgeGrabbing = false;
+        stat.LedgeClimbing = true;
     }
 
     // for animation event
@@ -449,9 +483,9 @@ ledge_grabbing:
     {
         tf.position = _ledgeClimbPosAfter;
         cl.isTrigger = false;
-        _ledgeGrabbing = false;
-        LedgeClimbing = false;
-        _canGrabLedge = true;
+        stat.LedgeGrabbing = false;
+        stat.LedgeClimbing = false;
+        stat.CanGrabLedge = true;
     }
 
 #endregion
@@ -463,13 +497,11 @@ ledge_grabbing:
     [Space(5)]
     [SerializeField][Range(0f, 1f)] private float wallJumpBufferTime = 0.1f;
     [SerializeField] private float timeBeforeWallJump = 0.05f;
-    [SerializeField] private Vector2 wallJumpPower = new(9.8f, 4f);
+    [SerializeField] private Vector2 wallJumpPower = new(9.5f, 4f);
     [SerializeField] private float wallJumpGravityMult = 1.35f;
     [SerializeField] private float wallJumpMoveAcceleration = 0.5f;
     [SerializeField] private float wallJumpMoveDecceleration = 0.6f;
-    public bool IsWallGrabbing { get; private set; } = false;
-    public bool IsWallClimbing { get; private set; } = false;
-    public bool IsWallJumping { get; private set; } = false;
+    // isWallGrabing == isWallCLimbing == true when wall climbing
     [Space(10)]
     [SerializeField] private Vector2 wallGrabOffset = new(-0.2f, 0f);
     [SerializeField] private Vector2 defaultWallGrabOffset = new(-0.25f, 0f);
@@ -480,26 +512,26 @@ ledge_grabbing:
         Vector2 wallGrabPos = tf.position;
         wallGrabPos.x = GetWallX();
         if (wallGrabPos.x == tf.position.x)
-            wallGrabPos += defaultWallGrabOffset * (_isFaceRight ? 1 : -1);
+            wallGrabPos += defaultWallGrabOffset * (stat.FaceRight ? 1 : -1);
         else
-            wallGrabPos += wallGrabOffset * (_isFaceRight ? 1 : -1);
+            wallGrabPos += wallGrabOffset * (stat.FaceRight ? 1 : -1);
 
         // start wall grab
-        timer.lastOnGround = 0;
-        IsWallGrabbing = true;
-        IsWallJumping = false;
+        timer.LastOnGround = 0;
+        stat.WallGrabbing = true;
+        stat.WallJumping = false;
         rb.velocity = Vector2.zero;
         tf.position = wallGrabPos;
 
         // for back to wall grab from ledge grab
         cl.isTrigger = false;
-        _ledgeGrabbing = false;
-        LedgeClimbing = false;
+        stat.LedgeGrabbing = false;
+        stat.LedgeClimbing = false;
 
-        if (!_canGrabLedge)
+        if (!stat.CanGrabLedge)
         {
             yield return new WaitForSeconds(delayForLedgeGrab);
-            _canGrabLedge = true;
+            stat.CanGrabLedge = true;
         }
         else yield break;
     }
@@ -508,27 +540,27 @@ ledge_grabbing:
     {
         if (input.RawV == 0)
         {
-            IsWallClimbing = false;
+            stat.WallClimbing = false;
             return;
         }
 
-        IsWallClimbing = true;
+        stat.WallClimbing = true;
         rb.velocity = new Vector2(0, input.V * wallClimbSpeed);
     }
 
     private IEnumerator WallJump()
     {
-        timer.lastPressJump = 0;
-        timer.lastOnGround = 0;
+        timer.LastPressJump = 0;
+        timer.LastOnGround = 0;
 
-        Vector2 force = new((_isFaceRight ? -1 : 1) * wallJumpPower.x, wallJumpPower.y);
+        Vector2 force = new((stat.FaceRight ? -1 : 1) * wallJumpPower.x, wallJumpPower.y);
 
         yield return new WaitForSeconds(timeBeforeWallJump);
-        IsWallJumping = true;
-        IsWallGrabbing = false;
-        IsWallClimbing = false;
-        _isJumping = false;
-        _isRunning = false;
+        stat.WallJumping = true;
+        stat.WallGrabbing = false;
+        stat.WallClimbing = false;
+        stat.Jumping = false;
+        stat.Running = false;
 
         rb.velocity = Vector2.zero;
         rb.AddForce(force, ForceMode2D.Impulse);

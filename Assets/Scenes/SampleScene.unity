@@ -411,7 +411,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 97095804}
   type: 0
-  _color: {r: 0, g: 1, b: 1, a: 1}
+  color: {r: 1, g: 0, b: 0, a: 1}
   width: 0.2
   height: 0.15
   radius: 0
@@ -463,7 +463,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 113255791}
   type: 2
-  _color: {r: 1, g: 0, b: 1, a: 1}
+  color: {r: 1, g: 0, b: 0, a: 1}
   width: 0
   height: 0
   radius: 0
@@ -515,7 +515,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 322074323}
   type: 2
-  _color: {r: 1, g: 0, b: 1, a: 1}
+  color: {r: 1, g: 0, b: 0, a: 1}
   width: 0
   height: 0
   radius: 0
@@ -567,7 +567,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 422927392}
   type: 0
-  _color: {r: 0, g: 1, b: 0, a: 1}
+  color: {r: 1, g: 0, b: 0, a: 1}
   width: 0.25
   height: 0.1
   radius: 0
@@ -1021,7 +1021,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 656001454}
   type: 2
-  _color: {r: 1, g: 0, b: 1, a: 1}
+  color: {r: 1, g: 0, b: 0, a: 1}
   width: 0
   height: 0
   radius: 0
@@ -1073,7 +1073,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 657187896}
   type: 2
-  _color: {r: 1, g: 0, b: 1, a: 1}
+  color: {r: 1, g: 0, b: 0, a: 1}
   width: 0
   height: 0
   radius: 0
@@ -1164,7 +1164,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 831303422}
   type: 2
-  _color: {r: 1, g: 0, b: 1, a: 1}
+  color: {r: 1, g: 0, b: 0, a: 1}
   width: 0
   height: 0
   radius: 0
@@ -1216,7 +1216,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 831629555}
   type: 0
-  _color: {r: 1, g: 0, b: 0, a: 1}
+  color: {r: 1, g: 0, b: 0, a: 1}
   width: 0.3
   height: 0.05
   radius: 0
@@ -1268,7 +1268,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 835580182}
   type: 2
-  _color: {r: 1, g: 0, b: 1, a: 1}
+  color: {r: 1, g: 0, b: 0, a: 1}
   width: 0
   height: 0
   radius: 0
@@ -1378,8 +1378,6 @@ MonoBehaviour:
   - {fileID: 657187897}
   wallToLedgeCheck: {fileID: 1938231732}
   wallBottomCheck: {fileID: 97095805}
-  onGround: 0
-  onWall: 0
   maxWalkSpeed: 1.6
   maxRunSpeed: 2.5
   moveAcceleration: 1.2
@@ -1404,14 +1402,12 @@ MonoBehaviour:
   defaultOffsetBefore: {x: 0.146, y: 0.1}
   defaultOffsetAfter: {x: 0.2, y: 0.2}
   wallClimbSpeed: 1.5
+  wallJumpBufferTime: 0.1
   timeBeforeWallJump: 0.05
-  wallJumpPower: {x: 9.8, y: 4}
+  wallJumpPower: {x: 9.5, y: 4}
   wallJumpGravityMult: 1.35
   wallJumpMoveAcceleration: 0.5
   wallJumpMoveDecceleration: 0.6
-  isWallGrabbing: 0
-  isWallClimbing: 0
-  isWallJumping: 0
   wallGrabOffset: {x: -0.19, y: 0}
   defaultWallGrabOffset: {x: -0.25, y: 0}
 --- !u!1 &980277305
@@ -1618,7 +1614,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 995822332}
   type: 2
-  _color: {r: 1, g: 0, b: 1, a: 1}
+  color: {r: 1, g: 0, b: 0, a: 1}
   width: 0
   height: 0
   radius: 0
@@ -1754,7 +1750,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 1284519807}
   type: 2
-  _color: {r: 1, g: 0, b: 1, a: 1}
+  color: {r: 1, g: 0, b: 0, a: 1}
   width: 0
   height: 0
   radius: 0
@@ -1806,7 +1802,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 1352356350}
   type: 2
-  _color: {r: 1, g: 0, b: 1, a: 1}
+  color: {r: 1, g: 0, b: 0, a: 1}
   width: 0
   height: 0
   radius: 0
@@ -2002,7 +1998,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 1487833876}
   type: 2
-  _color: {r: 1, g: 0, b: 1, a: 1}
+  color: {r: 1, g: 0, b: 0, a: 1}
   width: 0
   height: 0
   radius: 0
@@ -2357,7 +2353,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 1790410453}
   type: 0
-  _color: {r: 1, g: 1, b: 0, a: 1}
+  color: {r: 1, g: 0, b: 0, a: 1}
   width: 0.05
   height: 0.2
   radius: 0
@@ -2883,7 +2879,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 1938231731}
   type: 0
-  _color: {r: 1, g: 0.3763099, b: 0, a: 1}
+  color: {r: 1, g: 0, b: 0, a: 1}
   width: 0.25
   height: 0.05
   radius: 0
@@ -2936,7 +2932,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 2005456739}
   type: 1
-  _color: {r: 0, g: 1, b: 1, a: 1}
+  color: {r: 1, g: 0, b: 0, a: 1}
   width: 0.08
   height: 0.08
   radius: 0.06
@@ -2988,7 +2984,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 2052807505}
   type: 0
-  _color: {r: 1, g: 1, b: 0, a: 1}
+  color: {r: 1, g: 0, b: 0, a: 1}
   width: 0.05
   height: 0.2
   radius: 0
@@ -3201,7 +3197,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tf: {fileID: 2118901734}
   type: 2
-  _color: {r: 1, g: 0, b: 1, a: 1}
+  color: {r: 1, g: 0, b: 0, a: 1}
   width: 0
   height: 0
   radius: 0
