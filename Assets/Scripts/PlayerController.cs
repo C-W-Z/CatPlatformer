@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
         rb.gravityScale = GravityScale;
         _isFaceRight = true;
         _isRunning = false;
-        isJumping = false;
+        _isJumping = false;
         _isJumpCutting = false;
         _ledgeGrabbing = false;
         LedgeClimbing = false;
@@ -38,16 +38,16 @@ public class PlayerController : MonoBehaviour
 
         #region Check States
 
-        if (isJumping && rb.velocity.y <= 0)
+        if (_isJumping && rb.velocity.y <= 0)
         {
-            isJumping = false;
+            _isJumping = false;
             _isJumpCutting = false;
         }
 
-        if (OnGround && !isJumping)
+        if (OnGround && !_isJumping)
             _lastOnGroundTimer = coyoteTime;
 
-        if (IsWallGrabbing && (!OnWall || !_input.WallPress || _ledgeGrabbing || LedgeClimbing))
+        if (IsWallGrabbing && (!OnWall || !input.WallPress || _ledgeGrabbing || LedgeClimbing))
         {
             IsWallGrabbing = false;
             IsWallClimbing = false;
@@ -66,13 +66,13 @@ public class PlayerController : MonoBehaviour
         if (!IsWallGrabbing && !IsWallClimbing)
             Move();
 
-        if (!IsWallGrabbing && !IsWallClimbing && !isJumping && !IsWallJumping && _lastOnGroundTimer > 0 && _lastPressJumpTimer > 0)
+        if (!IsWallGrabbing && !IsWallClimbing && !_isJumping && !IsWallJumping && _lastOnGroundTimer > 0 && _lastPressJumpTimer > 0)
             StartCoroutine(Jump());
 
-        if (_input.JumpUp && (isJumping || IsWallJumping) && rb.velocity.y > 0)
+        if (input.JumpUp && (_isJumping || IsWallJumping) && rb.velocity.y > 0)
             JumpCut();
 
-        if (!IsWallGrabbing && _input.WallPress && !IsWallJumping)
+        if (!IsWallGrabbing && input.WallPress && !IsWallJumping)
         {
             if (OnWall)
                 StartCoroutine(StartWallGrab());
@@ -86,7 +86,7 @@ public class PlayerController : MonoBehaviour
         if (IsWallGrabbing && !IsWallJumping)
             WallClimb();
 
-        if (IsWallGrabbing && _lastPressWallJumpTimer > 0 && !isJumping && !IsWallJumping)
+        if (IsWallGrabbing && _lastPressWallJumpTimer > 0 && !_isJumping && !IsWallJumping)
             StartCoroutine(WallJump());
 
         if (_ledgeDetected && _canGrabLedge)
@@ -107,9 +107,9 @@ ledge_grabbing:
 
             if (_ledgeGrabbing)
             {
-                if (_input.JumpDown)
+                if (input.JumpDown)
                     LedgeClimb();
-                if (_input.RawV < 0)
+                if (input.RawV < 0)
                     StartCoroutine(StartWallGrab());
             }
         }
@@ -147,7 +147,7 @@ ledge_grabbing:
         public bool WallPress;
     }
 
-    private Input _input;
+    private Input input;
     [Header("Input")]
     [SerializeField][Range(0f, 1f)] private float doubleMoveDownCheckTime = 0.5f;
     private bool _canCheckDoubleMoveDown = true;
@@ -155,16 +155,16 @@ ledge_grabbing:
 
     private void GetInput()
     {
-        _input.H = UnityEngine.Input.GetAxis("Horizontal");
-        _input.V = UnityEngine.Input.GetAxis("Vertical");
-        _input.RawH = UnityEngine.Input.GetAxisRaw("Horizontal");
-        _input.RawV = UnityEngine.Input.GetAxisRaw("Vertical");
-        _input.MoveDown = UnityEngine.Input.GetButtonDown("Horizontal");
-        _input.JumpDown = UnityEngine.Input.GetButtonDown("Jump");
-        _input.JumpUp = UnityEngine.Input.GetButtonUp("Jump");
-        _input.WallPress = UnityEngine.Input.GetButton("Wall");
+        input.H = UnityEngine.Input.GetAxis("Horizontal");
+        input.V = UnityEngine.Input.GetAxis("Vertical");
+        input.RawH = UnityEngine.Input.GetAxisRaw("Horizontal");
+        input.RawV = UnityEngine.Input.GetAxisRaw("Vertical");
+        input.MoveDown = UnityEngine.Input.GetButtonDown("Horizontal");
+        input.JumpDown = UnityEngine.Input.GetButtonDown("Jump");
+        input.JumpUp = UnityEngine.Input.GetButtonUp("Jump");
+        input.WallPress = UnityEngine.Input.GetButton("Wall");
 
-        if (_input.MoveDown)
+        if (input.MoveDown)
             _moveDownCount++;
 
         if (_moveDownCount == 1 && _canCheckDoubleMoveDown)
@@ -173,13 +173,13 @@ ledge_grabbing:
             StartCoroutine(DetectDoubleMoveDown());
         }
 
-        if (_input.RawH == 0)
+        if (input.RawH == 0)
             _isRunning = false;
 
-        if (_input.JumpDown)
+        if (input.JumpDown)
             _lastPressJumpTimer = jumpBufferTime;
 
-        if (_input.WallPress && _input.JumpDown)
+        if (input.WallPress && input.JumpDown)
             _lastPressWallJumpTimer = wallJumpBufferTime;
     }
 
@@ -275,10 +275,10 @@ ledge_grabbing:
 
     private void Move()
     {
-        float targetSpeed = _input.H * (_isRunning ? maxRunSpeed : maxWalkSpeed);
-        float accelerate = (_input.RawH != 0) ? moveAcceleration : moveDecceleration;
+        float targetSpeed = input.H * (_isRunning ? maxRunSpeed : maxWalkSpeed);
+        float accelerate = (input.RawH != 0) ? moveAcceleration : moveDecceleration;
         if (IsWallJumping)
-            accelerate = (_input.RawH != 0) ? wallJumpMoveAcceleration : wallJumpMoveDecceleration;
+            accelerate = (input.RawH != 0) ? wallJumpMoveAcceleration : wallJumpMoveDecceleration;
         // faster when air time
         if (JumpAirTiming)
         {
@@ -289,7 +289,7 @@ ledge_grabbing:
         float movement = speedDiff * accelerate;
         // friction
         float friction = 0;
-        if (_lastOnGroundTimer > 0 && _input.RawH == 0)
+        if (_lastOnGroundTimer > 0 && input.RawH == 0)
             friction = Mathf.Min(Mathf.Abs(rb.velocity.x), frictionAmount) * Mathf.Sign(rb.velocity.x);
         rb.AddForce((movement - friction) * Vector2.right, ForceMode2D.Force);
     }
@@ -300,9 +300,9 @@ ledge_grabbing:
 
         if (_ledgeGrabbing || LedgeClimbing || IsWallGrabbing || IsWallClimbing)
             return;
-        if (OnWall && ((_input.RawH > 0 && _isFaceRight) || (_input.RawH < 0 && !_isFaceRight)))
+        if (OnWall && ((input.RawH > 0 && _isFaceRight) || (input.RawH < 0 && !_isFaceRight)))
             return;
-        if ((_input.RawH < 0 && _isFaceRight) || (_input.RawH > 0 && !_isFaceRight))
+        if ((input.RawH < 0 && _isFaceRight) || (input.RawH > 0 && !_isFaceRight))
             Turn();
     }
 
@@ -328,8 +328,8 @@ ledge_grabbing:
     [Space(10)]
     [SerializeField] private float jumpAirTimeYSpeed = 0.5f;
     [SerializeField][Range(0f, 1f)] private float jumpAirTimeGravityMult = 0.3f;
-    private bool isJumping = false;
-    private bool JumpAirTiming => isJumping && Mathf.Abs(rb.velocity.y) < jumpAirTimeYSpeed;
+    private bool _isJumping = false;
+    private bool JumpAirTiming => _isJumping && Mathf.Abs(rb.velocity.y) < jumpAirTimeYSpeed;
 
     private IEnumerator Jump()
     {
@@ -342,20 +342,20 @@ ledge_grabbing:
         yield return new WaitForSeconds(timeBeforeJump);
         // jump
         rb.AddForce(jumpForce * Vector2.up, ForceMode2D.Impulse);
-        isJumping = true;
+        _isJumping = true;
         _lastOnGroundTimer = 0;
     }
 
     [Space(10)]
-    [SerializeField][Range(0f, 1f)] private float _jumpCutVelocityMult = 0.5f;
-    [SerializeField][Min(1f)] private float _jumpCutGravityMult = 1.4f;
+    [SerializeField][Range(0f, 1f)] private float jumpCutVelocityMult = 0.5f;
+    [SerializeField][Min(1f)] private float jumpCutGravityMult = 1.4f;
     private bool _isJumpCutting = false;
 
     private void JumpCut()
     {
         if (rb.velocity.y <= 0)
             return;
-        rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * _jumpCutVelocityMult);
+        rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * jumpCutVelocityMult);
         _isJumpCutting = true;
     }
 
@@ -379,7 +379,7 @@ ledge_grabbing:
         else if (rb.velocity.y < 0)
             rb.gravityScale = GravityScale * (OnWall ? slideGravityMult : fallGravityMult);
         else if (_isJumpCutting)
-            rb.gravityScale = GravityScale * _jumpCutGravityMult;
+            rb.gravityScale = GravityScale * jumpCutGravityMult;
         else if (JumpAirTiming)
             rb.gravityScale = GravityScale * jumpAirTimeGravityMult;
         else
@@ -419,7 +419,7 @@ ledge_grabbing:
         // grab
         _canGrabLedge = false;
         _ledgeGrabbing = true;
-        isJumping = false;
+        _isJumping = false;
         _isJumpCutting = false;
         _isRunning = false;
         IsWallClimbing = false;
@@ -451,6 +451,7 @@ ledge_grabbing:
 
     [Header("Wall")]
     [SerializeField] private float wallClimbSpeed = 1.5f;
+    [Space(5)]
     [SerializeField][Range(0f, 1f)] private float wallJumpBufferTime = 0.1f;
     [SerializeField] private float timeBeforeWallJump = 0.05f;
     [SerializeField] private Vector2 wallJumpPower = new(9.8f, 4f);
@@ -460,6 +461,7 @@ ledge_grabbing:
     public bool IsWallGrabbing { get; private set; } = false;
     public bool IsWallClimbing { get; private set; } = false;
     public bool IsWallJumping { get; private set; } = false;
+    [Space(10)]
     [SerializeField] private Vector2 wallGrabOffset = new(-0.2f, 0f);
     [SerializeField] private Vector2 defaultWallGrabOffset = new(-0.25f, 0f);
 
@@ -495,14 +497,14 @@ ledge_grabbing:
 
     private void WallClimb()
     {
-        if (_input.RawV == 0)
+        if (input.RawV == 0)
         {
             IsWallClimbing = false;
             return;
         }
 
         IsWallClimbing = true;
-        rb.velocity = new Vector2(0, _input.V * wallClimbSpeed);
+        rb.velocity = new Vector2(0, input.V * wallClimbSpeed);
     }
 
     private IEnumerator WallJump()
@@ -516,7 +518,7 @@ ledge_grabbing:
         IsWallJumping = true;
         IsWallGrabbing = false;
         IsWallClimbing = false;
-        isJumping = false;
+        _isJumping = false;
         _isRunning = false;
 
         rb.velocity = Vector2.zero;

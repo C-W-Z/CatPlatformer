@@ -7,8 +7,8 @@ public class PlayerAnimator : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private PlayerController player;
     [SerializeField] private float resetDelayTime = 0.1f;
-    private bool startJumpAnimation = false;
-    private bool startLedgeGrabAnimation = false;
+    private bool _startJumpAnimation = false;
+    private bool _startLedgeGrabAnimation = false;
     [SerializeField] private Vector2 normalPos = new(0, 0);
     [SerializeField] private Vector2 wallGrabPos = new(0, -0.07f);
     [SerializeField] private Vector2 wallClimbUpPos = new(0, -0.07f);
@@ -23,17 +23,17 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetBool("onGround", player.OnGround);
         animator.SetFloat("xSpeed", Mathf.Abs(player.RB.velocity.x));
         animator.SetFloat("yVeloc", player.RB.velocity.y);
-        animator.SetBool("startJump", startJumpAnimation);
-        animator.SetBool("startLedgeGrab", startLedgeGrabAnimation);
+        animator.SetBool("startJump", _startJumpAnimation);
+        animator.SetBool("startLedgeGrab", _startLedgeGrabAnimation);
         animator.SetBool("ledgeClimbing", player.LedgeClimbing);
         animator.SetBool("wallGrabbing", player.IsWallGrabbing);
         animator.SetBool("wallClimbing", player.IsWallClimbing);
         animator.SetBool("wallJumping", player.IsWallJumping);
         animator.SetBool("onWall", player.OnWall);
 
-        if (startJumpAnimation)
+        if (_startJumpAnimation)
             Invoke(nameof(ResetJumpAnimation), resetDelayTime);
-        if (startLedgeGrabAnimation)
+        if (_startLedgeGrabAnimation)
             Invoke(nameof(ResetLedgeGrabAnimation), resetDelayTime);
 
         if (player.IsWallClimbing && !sr.flipY)
@@ -47,19 +47,19 @@ public class PlayerAnimator : MonoBehaviour
     }
     public void SetJumpAnimation()
     {
-        startJumpAnimation = true;
+        _startJumpAnimation = true;
     }
     private void ResetJumpAnimation()
     {
-        startJumpAnimation = false;
+        _startJumpAnimation = false;
     }
     public void SetLedgeGrabAnimation()
     {
-        startLedgeGrabAnimation = true;
+        _startLedgeGrabAnimation = true;
     }
     private void ResetLedgeGrabAnimation()
     {
-        startLedgeGrabAnimation = false;
+        _startLedgeGrabAnimation = false;
     }
     // for animation event
     public void LedgeClimbEnd()

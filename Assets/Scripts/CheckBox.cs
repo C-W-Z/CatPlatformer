@@ -11,7 +11,7 @@ public class CheckBox : MonoBehaviour
 
     [SerializeField] private Transform tf;
     [SerializeField] private Type type = Type.Rectangle;
-    [SerializeField] private Color _color = Color.red;
+    [SerializeField] private Color color = Color.red;
     [SerializeField] private float width, height;
     [SerializeField] private float radius;
     [SerializeField] private Vector2 direction;
@@ -19,7 +19,7 @@ public class CheckBox : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        Gizmos.color = _color;
+        Gizmos.color = this.color;
         switch (type)
         {
             case Type.Rectangle:
