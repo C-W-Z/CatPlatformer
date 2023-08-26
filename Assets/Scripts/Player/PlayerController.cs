@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
         normalCollider.isTrigger = false;
         rb.gravityScale = GravityScale;
         stat.ResetAll();
+        _dashCooling = false;
+        _canDashCount = 1;
     }
 
     void Update()
@@ -64,12 +66,18 @@ public class PlayerController : MonoBehaviour
         if ((stat.Sneaking && (input.RawV >= 0 || !OnGround || stat.WallGrabbing)) || (!stat.Sneaking && normalCollider.enabled == false))
             EndSneak();
 
+        if (sur.OnGround || sur.OnWall)
+            _canDashCount = 1;
+
         #endregion
+
+        if (stat.LedgeGrabbing || stat.LedgeClimbing || stat.Dashing)
+            goto skip_movement;
 
         #region Player Movements
 
-        if (stat.LedgeGrabbing || stat.LedgeClimbing)
-            goto ledge_grabbing;
+        if (input.DashDown && !stat.Dashing && !_dashCooling && _canDashCount > 0)
+            StartCoroutine(Dash());
 
         if (!stat.Sneaking && !stat.WallGrabbing && sur.OnGround && input.RawV < 0)
             StartSneak();
@@ -97,6 +105,8 @@ public class PlayerController : MonoBehaviour
         if (stat.WallGrabbing && timer.LastPressWallJump > 0 && !stat.Jumping && !stat.WallJumping)
             StartCoroutine(WallJump());
 
+skip_movement:
+
         if (sur.LedgeDetected && stat.CanGrabLedge)
             StartLedgeGrab();
 
@@ -105,7 +115,6 @@ public class PlayerController : MonoBehaviour
         if (stat.WallGrabbing && !stat.WallClimbing)
             rb.velocity = Vector2.zero;
 
-ledge_grabbing:
         if (stat.LedgeGrabbing || stat.LedgeClimbing)
         {
             normalCollider.isTrigger = true;
@@ -130,7 +139,7 @@ ledge_grabbing:
 
     void FixedUpdate()
     {
-        if (stat.LedgeGrabbing || stat.LedgeClimbing)
+        if (stat.LedgeGrabbing || stat.LedgeClimbing || stat.Dashing)
             return;
 
         if (!stat.WallGrabbing && !stat.WallClimbing)
@@ -176,7 +185,8 @@ ledge_grabbing:
     [SerializeField] private CheckBox wallBottomCheck;
 
     [System.Serializable]
-    private struct Surrounding {
+    private struct Surrounding
+    {
         public bool OnGround;
         public bool OnWall;
         public bool BackWallDetected;
@@ -194,7 +204,7 @@ ledge_grabbing:
         sur.OnWall = wallCheck.Detect(groundLayer);
         sur.BackWallDetected = backWallCheck.Detect(groundLayer);
         sur.LedgeDetected = (ledgeCheck.Detect(groundLayer) && !ledgeCheckTop.Detect(groundLayer)) ||
-        ((stat.LedgeGrabbing || stat.LedgeClimbing || (sur.OnWall && rb.velocity.y < 0)) &&
+        ((stat.WallGrabbing || stat.WallClimbing || (sur.OnWall && rb.velocity.y < 0)) &&
           !wallToLedgeCheck.Detect(groundLayer) && wallBottomCheck.Detect(groundLayer));
     }
 
@@ -232,11 +242,25 @@ ledge_grabbing:
 #region Input
 
     [System.Serializable]
-    private struct Input {
+    private struct Input
+    {
         public float H, V, RawH, RawV;
         public bool MoveDown;
         public bool JumpDown, JumpUp;
         public bool WallPress;
+        public bool DashDown;
+        public void Update()
+        {
+            H = UnityEngine.Input.GetAxis("Horizontal");
+            V = UnityEngine.Input.GetAxis("Vertical");
+            RawH = UnityEngine.Input.GetAxisRaw("Horizontal");
+            RawV = UnityEngine.Input.GetAxisRaw("Vertical");
+            MoveDown = UnityEngine.Input.GetButtonDown("Horizontal");
+            JumpDown = UnityEngine.Input.GetButtonDown("Jump");
+            JumpUp = UnityEngine.Input.GetButtonUp("Jump");
+            WallPress = UnityEngine.Input.GetButton("Wall");
+            DashDown = UnityEngine.Input.GetButtonDown("Dash");
+        }
     }
 
     private Input input;
@@ -247,14 +271,7 @@ ledge_grabbing:
 
     private void GetInput()
     {
-        input.H = UnityEngine.Input.GetAxis("Horizontal");
-        input.V = UnityEngine.Input.GetAxis("Vertical");
-        input.RawH = UnityEngine.Input.GetAxisRaw("Horizontal");
-        input.RawV = UnityEngine.Input.GetAxisRaw("Vertical");
-        input.MoveDown = UnityEngine.Input.GetButtonDown("Horizontal");
-        input.JumpDown = UnityEngine.Input.GetButtonDown("Jump");
-        input.JumpUp = UnityEngine.Input.GetButtonUp("Jump");
-        input.WallPress = UnityEngine.Input.GetButton("Wall");
+        input.Update();
 
         if (input.MoveDown)
             _moveDownCount++;
@@ -301,12 +318,14 @@ ledge_grabbing:
         public bool WallGrabbing;
         public bool WallClimbing;
         public bool WallJumping;
+        public bool Dashing;
 
         public void ResetAll()
         {
             FaceRight = true;
             CanGrabLedge = true;
             Running = false;
+            Dashing = false;
             Reset();
         }
 
@@ -470,7 +489,7 @@ ledge_grabbing:
 
     private void SetGravity()
     {
-        if (stat.LedgeGrabbing || stat.LedgeClimbing || stat.WallGrabbing || stat.WallClimbing)
+        if (stat.Dashing || stat.LedgeGrabbing || stat.LedgeClimbing || stat.WallGrabbing || stat.WallClimbing)
             rb.gravityScale = 0;
         else if (stat.WallJumping)
             rb.gravityScale = GravityScale * wallJumpGravityMult;
@@ -616,7 +635,7 @@ ledge_grabbing:
 
         Vector2 force = new((stat.FaceRight ? -1 : 1) * wallJumpPower.x, wallJumpPower.y);
 
-        tf.position += new Vector3(wallJumpOffset.x * (stat.FaceRight ? -1:1), wallJumpOffset.y, 0);
+        tf.position += new Vector3(wallJumpOffset.x * (stat.FaceRight ? -1 : 1), wallJumpOffset.y, 0);
         rb.velocity = Vector2.zero;
 
         yield return new WaitForSeconds(timeBeforeWallJump);
@@ -628,11 +647,63 @@ ledge_grabbing:
         stat.WallJumping = true;
 
         rb.velocity = Vector2.zero;
+        Turn();
         rb.AddForce(force, ForceMode2D.Impulse);
 
         Debug.Log($"before {rb.velocity}");
         yield return new WaitForSeconds(0.1f);
         Debug.Log($"after {rb.velocity}");
+    }
+
+#endregion
+
+#region Dash
+
+    [Header("Dash")]
+    [SerializeField] private float timeBeforeDash = 0.02f;
+    [SerializeField] private Vector2 wallDashOffset = new(0.03f, 0f);
+    [SerializeField] private float dashSpeed = 5f;
+    [SerializeField] private float wallDashSpeed = 5f;
+    [SerializeField] private float dashTime = 0.2f;
+    [SerializeField] private float runDashTime = 0.3f;
+    private bool _dashCooling = false;
+    private int _canDashCount = 1;
+
+    private IEnumerator Dash()
+    {
+        timer.LastPressWallJump = 0;
+        timer.LastPressJump = 0;
+        timer.LastPressMove = 0;
+        _canDashCount--;
+        _dashCooling = true;
+        stat.Reset();
+        stat.Dashing = true;
+
+        // record origin velocity;
+        Vector2 originVelocity = rb.velocity;
+        // calculate dash speed
+        if (sur.OnWall)
+            Turn();
+        float speed = stat.FaceRight ? 1 : -1;
+        if (sur.OnWall)
+            speed *= wallDashSpeed;
+        else
+            speed *= dashSpeed;
+
+        tf.position += new Vector3(wallDashOffset.x * (stat.FaceRight ? -1 : 1), wallDashOffset.y, 0);
+        // start dash animation
+        animator.SetDashAnimation();
+
+        yield return new WaitForSeconds(timeBeforeDash);
+
+        // dash
+        rb.velocity = new Vector2(speed, 0);
+
+        yield return new WaitForSeconds(stat.Running ? runDashTime : dashTime);
+        // end dash
+        rb.velocity = originVelocity;
+        stat.Dashing = false;
+        _dashCooling = false;
     }
 
 #endregion

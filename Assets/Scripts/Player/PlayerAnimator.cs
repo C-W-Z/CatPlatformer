@@ -9,6 +9,7 @@ public class PlayerAnimator : MonoBehaviour
     [SerializeField] private float resetDelayTime = 0.1f;
     private bool _startJumpAnimation = false;
     private bool _startLedgeGrabAnimation = false;
+    private bool _startDashAnimation = false;
     [SerializeField] private Vector2 normalPos = new(0, 0);
     [SerializeField] private Vector2 wallGrabPos = new(0, -0.07f);
     [SerializeField] private Vector2 wallClimbUpPos = new(0, -0.07f);
@@ -32,11 +33,14 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetBool("wallGrabbing", player.IsWallGrabbing);
         animator.SetBool("wallClimbing", player.IsWallClimbing);
         animator.SetBool("wallJumping", player.IsWallJumping);
+        animator.SetBool("dashing", _startDashAnimation);
 
         if (_startJumpAnimation)
             Invoke(nameof(ResetJumpAnimation), resetDelayTime);
         if (_startLedgeGrabAnimation)
             Invoke(nameof(ResetLedgeGrabAnimation), resetDelayTime);
+        if (_startDashAnimation)
+            Invoke(nameof(ResetDashAnimation), resetDelayTime);
 
         if (player.IsWallClimbing && !sr.flipY)
             tf.localPosition = wallClimbUpPos;
@@ -47,21 +51,23 @@ public class PlayerAnimator : MonoBehaviour
         else
             tf.localPosition = normalPos;
     }
-    public void SetJumpAnimation()
-    {
+    public void SetJumpAnimation() {
         _startJumpAnimation = true;
     }
-    private void ResetJumpAnimation()
-    {
+    private void ResetJumpAnimation() {
         _startJumpAnimation = false;
     }
-    public void SetLedgeGrabAnimation()
-    {
+    public void SetLedgeGrabAnimation() {
         _startLedgeGrabAnimation = true;
     }
-    private void ResetLedgeGrabAnimation()
-    {
+    private void ResetLedgeGrabAnimation() {
         _startLedgeGrabAnimation = false;
+    }
+    public void SetDashAnimation() {
+        _startDashAnimation = true;
+    }
+    private void ResetDashAnimation() {
+        _startDashAnimation = false;
     }
     // for animation event
     public void LedgeClimbEnd()
