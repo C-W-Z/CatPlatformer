@@ -320,7 +320,7 @@ PolygonCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 20558931}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 6200000, guid: 6d2957373f4078d4da8078104a50c769, type: 2}
   m_IncludeLayers:
@@ -1354,7 +1354,6 @@ MonoBehaviour:
   cl: {fileID: 1037190282}
   cl_s: {fileID: 20558933}
   animator: {fileID: 2062787986}
-  doubleMoveDownCheckTime: 0.5
   groundLayer:
     serializedVersion: 2
     m_Bits: 2048
@@ -1378,8 +1377,10 @@ MonoBehaviour:
   - {fileID: 657187897}
   wallToLedgeCheck: {fileID: 1938231732}
   wallBottomCheck: {fileID: 97095805}
+  doubleMoveDownCheckTime: 0.5
   maxWalkSpeed: 1.6
   maxRunSpeed: 2.5
+  maxSneakSpeed: 1
   moveAcceleration: 1.2
   moveDecceleration: 1.6
   frictionAmount: 0.5
@@ -1404,10 +1405,10 @@ MonoBehaviour:
   wallClimbSpeed: 1.5
   wallJumpBufferTime: 0.1
   timeBeforeWallJump: 0.05
-  wallJumpPower: {x: 9.5, y: 4}
+  wallJumpPower: {x: 7.5, y: 4}
   wallJumpGravityMult: 1.35
-  wallJumpMoveAcceleration: 0.5
-  wallJumpMoveDecceleration: 0.6
+  wallJumpMoveAcceleration: 1
+  wallJumpMoveDecceleration: 0.8
   wallGrabOffset: {x: -0.19, y: 0}
   defaultWallGrabOffset: {x: -0.25, y: 0}
 --- !u!1 &980277305

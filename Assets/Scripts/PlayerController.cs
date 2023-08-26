@@ -17,8 +17,9 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        cl.isTrigger = false;
+        cl.enabled = true;
         cl_s.enabled = false;
+        cl.isTrigger = false;
         rb.gravityScale = GravityScale;
         stat.ResetAll();
     }
@@ -51,12 +52,18 @@ public class PlayerController : MonoBehaviour
 
         stat.JumpAirTiming = stat.Jumping && Mathf.Abs(rb.velocity.y) < jumpAirTimeYSpeed;
 
+        if ((stat.Sneaking && (input.RawV >= 0 || !OnGround || stat.WallGrabbing)) || (!stat.Sneaking && cl.enabled == false))
+            EndSneak();
+
         #endregion
 
         #region Player Movements
 
         if (stat.LedgeGrabbing || stat.LedgeClimbing)
             goto ledge_grabbing;
+
+        if (!stat.Sneaking && !stat.WallGrabbing && sur.OnGround && input.RawV < 0)
+            StartSneak();
 
         if (!stat.WallGrabbing && !stat.WallClimbing)
             Move();
@@ -85,7 +92,7 @@ public class PlayerController : MonoBehaviour
             StartCoroutine(WallJump());
 
         if (sur.LedgeDetected && stat.CanGrabLedge)
-            LedgeGrab();
+            StartLedgeGrab();
 
         #endregion
 
@@ -103,7 +110,7 @@ ledge_grabbing:
             if (stat.LedgeGrabbing)
             {
                 if (input.JumpDown)
-                    LedgeClimb();
+                    StartLedgeClimb();
                 if (input.RawV < 0)
                     StartCoroutine(StartWallGrab());
             }
@@ -276,6 +283,7 @@ ledge_grabbing:
     {
         public bool FaceRight;
         public bool Running;
+        public bool Sneaking;
         public bool Jumping;
         public bool JumpAirTiming;
         public bool JumpCutting;
@@ -291,6 +299,12 @@ ledge_grabbing:
             FaceRight = true;
             CanGrabLedge = true;
             Running = false;
+            Reset();
+        }
+
+        public void Reset()
+        {
+            Sneaking = false;
             Jumping = false;
             JumpAirTiming = false;
             JumpCutting = false;
@@ -304,6 +318,7 @@ ledge_grabbing:
 
     private Stat stat;
     // for animator access
+    public bool IsSneaking => stat.Sneaking;
     public bool IsLedgeClimbing => stat.LedgeClimbing;
     public bool IsWallGrabbing => stat.WallGrabbing;
     public bool IsWallClimbing => stat.WallClimbing;
@@ -316,7 +331,7 @@ ledge_grabbing:
     [Header("Move")]
     [SerializeField][Min(0f)] private float maxWalkSpeed = 1.6f;
     [SerializeField][Min(0f)] private float maxRunSpeed = 2.5f;
-    
+    [SerializeField][Min(0f)] private float maxSneakSpeed = 1f;
     [SerializeField][Min(0f)] private float moveAcceleration = 1.2f, moveDecceleration = 1.6f;
     [SerializeField][Min(0f)] private float frictionAmount = 0.5f;
     [Space(10)]
@@ -324,10 +339,17 @@ ledge_grabbing:
 
     private void Move()
     {
-        float targetSpeed = input.H * (stat.Running ? maxRunSpeed : maxWalkSpeed);
-        float accelerate = (input.RawH != 0) ? moveAcceleration : moveDecceleration;
+        float targetSpeed, accelerate;
+        if (stat.Running)
+            targetSpeed = input.H * maxRunSpeed;
+        else if (stat.Sneaking)
+            targetSpeed = input.H * maxSneakSpeed;
+        else
+            targetSpeed = input.H * maxWalkSpeed;
         if (stat.WallJumping)
-            accelerate = (input.RawH != 0) ? wallJumpMoveAcceleration : wallJumpMoveDecceleration;
+            accelerate = ((input.RawH > 0 && rb.velocity.x > 0) || (input.H < 0 && rb.velocity.x < 0)) ? wallJumpMoveAcceleration : wallJumpMoveDecceleration;
+        else
+            accelerate = ((input.RawH > 0 && rb.velocity.x > 0) || (input.H < 0 && rb.velocity.x < 0)) ? moveAcceleration : moveDecceleration;
         // faster when air time
         if (stat.JumpAirTiming)
         {
@@ -341,6 +363,23 @@ ledge_grabbing:
         if (timer.LastOnGround > 0 && input.RawH == 0)
             friction = Mathf.Min(Mathf.Abs(rb.velocity.x), frictionAmount) * Mathf.Sign(rb.velocity.x);
         rb.AddForce((movement - friction) * Vector2.right, ForceMode2D.Force);
+    }
+
+    private void StartSneak()
+    {
+        stat.Reset();
+        stat.CanGrabLedge = true;
+        stat.Running = false;
+        stat.Sneaking = true;
+        cl.enabled = false;
+        cl_s.enabled = true;
+    }
+
+    private void EndSneak()
+    {
+        stat.Sneaking = false;
+        cl.enabled = true;
+        cl_s.enabled = false;
     }
 
     private void CheckFaceDir()
@@ -389,6 +428,7 @@ ledge_grabbing:
         yield return new WaitForSeconds(timeBeforeJump);
         // jump
         rb.AddForce(jumpForce * Vector2.up, ForceMode2D.Impulse);
+        stat.Reset();
         stat.Jumping = true;
         timer.LastOnGround = 0;
     }
@@ -402,6 +442,7 @@ ledge_grabbing:
         if (rb.velocity.y <= 0)
             return;
         rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * jumpCutVelocityMult);
+        stat.Reset();
         stat.JumpCutting = true;
     }
 
@@ -450,7 +491,7 @@ ledge_grabbing:
     private Vector2 _ledgeClimbPosBefore;
     private Vector2 _ledgeClimbPosAfter;
 
-    private void LedgeGrab()
+    private void StartLedgeGrab()
     {
         // get corner position
         Vector2 cornerPos = GetLedgeCornerPos();
@@ -465,6 +506,7 @@ ledge_grabbing:
         stat.Jumping = false;
         stat.JumpCutting = false;
         stat.Running = false;
+        stat.Sneaking = false;
         stat.WallClimbing = false;
         stat.WallGrabbing = false;
         stat.WallJumping = false;
@@ -472,7 +514,7 @@ ledge_grabbing:
         animator.SetLedgeGrabAnimation();
     }
 
-    private void LedgeClimb()
+    private void StartLedgeClimb()
     {
         stat.LedgeGrabbing = false;
         stat.LedgeClimbing = true;
@@ -520,6 +562,8 @@ ledge_grabbing:
         timer.LastOnGround = 0;
         stat.WallGrabbing = true;
         stat.WallJumping = false;
+        stat.Running = false;
+        stat.Sneaking = false;
         rb.velocity = Vector2.zero;
         tf.position = wallGrabPos;
 
@@ -544,6 +588,7 @@ ledge_grabbing:
             return;
         }
 
+        stat.WallGrabbing = true;
         stat.WallClimbing = true;
         rb.velocity = new Vector2(0, input.V * wallClimbSpeed);
     }
@@ -561,6 +606,7 @@ ledge_grabbing:
         stat.WallClimbing = false;
         stat.Jumping = false;
         stat.Running = false;
+        stat.Sneaking = false;
 
         rb.velocity = Vector2.zero;
         rb.AddForce(force, ForceMode2D.Impulse);

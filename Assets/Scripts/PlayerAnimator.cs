@@ -21,15 +21,16 @@ public class PlayerAnimator : MonoBehaviour
     public void SetAnimation()
     {
         animator.SetBool("onGround", player.OnGround);
+        animator.SetBool("onWall", player.OnWall);
         animator.SetFloat("xSpeed", Mathf.Abs(player.RB.velocity.x));
         animator.SetFloat("yVeloc", player.RB.velocity.y);
+        animator.SetBool("sneaking", player.IsSneaking);
         animator.SetBool("startJump", _startJumpAnimation);
         animator.SetBool("startLedgeGrab", _startLedgeGrabAnimation);
         animator.SetBool("ledgeClimbing", player.IsLedgeClimbing);
         animator.SetBool("wallGrabbing", player.IsWallGrabbing);
         animator.SetBool("wallClimbing", player.IsWallClimbing);
         animator.SetBool("wallJumping", player.IsWallJumping);
-        animator.SetBool("onWall", player.OnWall);
 
         if (_startJumpAnimation)
             Invoke(nameof(ResetJumpAnimation), resetDelayTime);
