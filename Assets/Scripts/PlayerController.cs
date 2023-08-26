@@ -7,8 +7,8 @@ public class PlayerController : MonoBehaviour
     [Header("Components")]
     [SerializeField] private Transform tf;
     [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private Collider2D cl; // normal collider
-    [SerializeField] private Collider2D cl_s; // sneak collider
+    [SerializeField] private Collider2D normalCollider; // normal collider
+    [SerializeField] private Collider2D sneakCollider; // sneak collider
     [SerializeField] private PlayerAnimator animator;
     // for animator access
     public Rigidbody2D RB => rb;
@@ -17,9 +17,9 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        cl.enabled = true;
-        cl_s.enabled = false;
-        cl.isTrigger = false;
+        normalCollider.enabled = true;
+        sneakCollider.enabled = false;
+        normalCollider.isTrigger = false;
         rb.gravityScale = GravityScale;
         stat.ResetAll();
     }
@@ -31,6 +31,15 @@ public class PlayerController : MonoBehaviour
         GetInput();
 
         #region Check States
+
+        if (input.RawH == 0)
+            stat.Running = false;
+
+        if (input.JumpDown)
+            timer.LastPressJump = jumpBufferTime;
+
+        if (input.WallPress && input.JumpDown)
+            timer.LastPressWallJump = wallJumpBufferTime;
 
         if (stat.Jumping && rb.velocity.y <= 0)
         {
@@ -52,7 +61,7 @@ public class PlayerController : MonoBehaviour
 
         stat.JumpAirTiming = stat.Jumping && Mathf.Abs(rb.velocity.y) < jumpAirTimeYSpeed;
 
-        if ((stat.Sneaking && (input.RawV >= 0 || !OnGround || stat.WallGrabbing)) || (!stat.Sneaking && cl.enabled == false))
+        if ((stat.Sneaking && (input.RawV >= 0 || !OnGround || stat.WallGrabbing)) || (!stat.Sneaking && normalCollider.enabled == false))
             EndSneak();
 
         #endregion
@@ -99,7 +108,7 @@ public class PlayerController : MonoBehaviour
 ledge_grabbing:
         if (stat.LedgeGrabbing || stat.LedgeClimbing)
         {
-            cl.isTrigger = true;
+            normalCollider.isTrigger = true;
             tf.position = (Vector3)_ledgeClimbPosBefore;
             rb.velocity = Vector2.zero;
             // rb.gravityScale = 0;
@@ -184,7 +193,9 @@ ledge_grabbing:
         sur.OnGround = groundCheck.Detect(groundLayer);
         sur.OnWall = wallCheck.Detect(groundLayer);
         sur.BackWallDetected = backWallCheck.Detect(groundLayer);
-        sur.LedgeDetected = (ledgeCheck.Detect(groundLayer) && !ledgeCheckTop.Detect(groundLayer)) || ((stat.WallGrabbing || stat.WallClimbing) && !wallToLedgeCheck.Detect(groundLayer) && wallBottomCheck.Detect(groundLayer));
+        sur.LedgeDetected = (ledgeCheck.Detect(groundLayer) && !ledgeCheckTop.Detect(groundLayer)) ||
+        ((stat.LedgeGrabbing || stat.LedgeClimbing || (sur.OnWall && rb.velocity.y < 0)) &&
+          !wallToLedgeCheck.Detect(groundLayer) && wallBottomCheck.Detect(groundLayer));
     }
 
     private float GetWallX()
@@ -253,15 +264,6 @@ ledge_grabbing:
             timer.LastPressMove = doubleMoveDownCheckTime;
             StartCoroutine(DetectDoubleMoveDown());
         }
-
-        if (input.RawH == 0)
-            stat.Running = false;
-
-        if (input.JumpDown)
-            timer.LastPressJump = jumpBufferTime;
-
-        if (input.WallPress && input.JumpDown)
-            timer.LastPressWallJump = wallJumpBufferTime;
     }
 
     private IEnumerator DetectDoubleMoveDown()
@@ -379,15 +381,15 @@ ledge_grabbing:
         stat.CanGrabLedge = true;
         stat.Running = false;
         stat.Sneaking = true;
-        cl.enabled = false;
-        cl_s.enabled = true;
+        normalCollider.enabled = false;
+        sneakCollider.enabled = true;
     }
 
     private void EndSneak()
     {
         stat.Sneaking = false;
-        cl.enabled = true;
-        cl_s.enabled = false;
+        normalCollider.enabled = true;
+        sneakCollider.enabled = false;
     }
 
     private void CheckFaceDir()
@@ -497,9 +499,9 @@ ledge_grabbing:
     [Header("Ledge")]
     [SerializeField] private float delayForLedgeGrab = 0.5f;
     [SerializeField] private Vector2 offsetBefore = new(0.063f, 0.22f);
-    [SerializeField] private Vector2 offsetAfter = new(0.35f, 0.4f);
-    [SerializeField] private Vector2 defaultOffsetBefore = new(0.146f, 0.22f);
-    [SerializeField] private Vector2 defaultOffsetAfter = new(0.35f, 0.4f);
+    [SerializeField] private Vector2 offsetAfter = new(0.25f, 0.4f);
+    [SerializeField] private Vector2 defaultOffsetBefore = new(0.146f, -0.1f);
+    [SerializeField] private Vector2 defaultOffsetAfter = new(0.2f, 0.2f);
     private Vector2 _ledgeClimbPosBefore;
     private Vector2 _ledgeClimbPosAfter;
 
@@ -536,7 +538,7 @@ ledge_grabbing:
     public void LedgeClimbOver()
     {
         tf.position = _ledgeClimbPosAfter;
-        cl.isTrigger = false;
+        normalCollider.isTrigger = false;
         stat.LedgeGrabbing = false;
         stat.LedgeClimbing = false;
         stat.CanGrabLedge = true;
@@ -559,7 +561,7 @@ ledge_grabbing:
     // isWallGrabing == isWallCLimbing == true when wall climbing
     [Space(10)]
     [SerializeField] private Vector2 wallGrabOffset = new(-0.2f, 0f);
-    [SerializeField] private Vector2 defaultWallGrabOffset = new(-0.25f, 0f);
+    [SerializeField] private Vector2 defaultWallGrabOffset = Vector2.zero;
 
     private IEnumerator StartWallGrab()
     {
@@ -581,7 +583,7 @@ ledge_grabbing:
         tf.position = wallGrabPos;
 
         // for back to wall grab from ledge grab
-        cl.isTrigger = false;
+        normalCollider.isTrigger = false;
         stat.LedgeGrabbing = false;
         stat.LedgeClimbing = false;
 
