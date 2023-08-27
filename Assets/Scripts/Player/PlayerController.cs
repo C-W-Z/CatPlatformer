@@ -314,7 +314,7 @@ skip_movement:
     [System.Serializable]
     private struct Stat
     {
-        public bool FaceRight;
+        public int Face; // 1 for right, -1 for left
         public bool Running;
         public bool Sneaking;
         public bool Jumping;
@@ -330,7 +330,7 @@ skip_movement:
 
         public void ResetAll()
         {
-            FaceRight = true;
+            Face = 1;
             CanGrabLedge = true;
             Running = false;
             Dashing = false;
@@ -426,16 +426,16 @@ skip_movement:
 
         if (stat.LedgeGrabbing || stat.LedgeClimbing || stat.WallGrabbing || stat.WallClimbing)
             return;
-        if (sur.OnWall && ((input.RawH > 0 && stat.FaceRight) || (input.RawH < 0 && !stat.FaceRight)))
+        if (sur.OnWall && input.RawH == stat.Face)
             return;
-        if ((input.RawH < 0 && stat.FaceRight) || (input.RawH > 0 && !stat.FaceRight))
+        if (input.RawH == -stat.Face)
             Turn();
     }
 
     private void Turn()
     {
         tf.localScale = new Vector2(-tf.localScale.x, tf.localScale.y);
-        stat.FaceRight = !stat.FaceRight;
+        stat.Face = -stat.Face;
         foreach (var ray in wallRays)
             ray.FlipDirX();
         // foreach (var ray in platformRays)
@@ -546,9 +546,9 @@ skip_movement:
         // get corner position
         Vector2 cornerPos = GetLedgeCornerPos();
         // set ledge grab and climb position        
-        _ledgeClimbPosBefore.x = cornerPos.x + ((cornerPos.x == tf.position.x) ? defaultOffsetBefore.x : offsetBefore.x) * (stat.FaceRight ? 1 : -1);
+        _ledgeClimbPosBefore.x = cornerPos.x + ((cornerPos.x == tf.position.x) ? defaultOffsetBefore.x : offsetBefore.x) * stat.Face;
         _ledgeClimbPosBefore.y = cornerPos.y + ((cornerPos.y == tf.position.y) ? defaultOffsetBefore.y : offsetBefore.y);
-        _ledgeClimbPosAfter.x = cornerPos.x + ((cornerPos.x == tf.position.x) ? defaultOffsetAfter.x : offsetAfter.x) * (stat.FaceRight ? 1 : -1);
+        _ledgeClimbPosAfter.x = cornerPos.x + ((cornerPos.x == tf.position.x) ? defaultOffsetAfter.x : offsetAfter.x) * stat.Face;
         _ledgeClimbPosAfter.y = cornerPos.y + ((cornerPos.y == tf.position.y) ? defaultOffsetAfter.y : offsetAfter.y);
         // grab
         stat.CanGrabLedge = false;
@@ -605,9 +605,9 @@ skip_movement:
         Vector2 wallGrabPos = tf.position;
         wallGrabPos.x = GetWallX();
         if (wallGrabPos.x == tf.position.x)
-            wallGrabPos += defaultWallGrabOffset * (stat.FaceRight ? 1 : -1);
+            wallGrabPos += defaultWallGrabOffset * stat.Face;
         else
-            wallGrabPos += wallGrabOffset * (stat.FaceRight ? 1 : -1);
+            wallGrabPos += wallGrabOffset * stat.Face;
 
         // start wall grab
         timer.LastOnGround = 0;
@@ -650,9 +650,9 @@ skip_movement:
         timer.LastPressJump = 0;
         timer.LastOnGround = 0;
 
-        Vector2 force = new((stat.FaceRight ? -1 : 1) * wallJumpPower.x, wallJumpPower.y);
+        Vector2 force = new(-stat.Face * wallJumpPower.x, wallJumpPower.y);
 
-        tf.position += new Vector3(wallJumpOffset.x * (stat.FaceRight ? -1 : 1), wallJumpOffset.y, 0);
+        tf.position += new Vector3(-stat.Face * wallJumpOffset.x, wallJumpOffset.y, 0);
         rb.velocity = Vector2.zero;
 
         yield return new WaitForSeconds(timeBeforeWallJump);
@@ -707,13 +707,13 @@ skip_movement:
         // calculate dash speed
         if (sur.OnWall)
             Turn();
-        float speed = stat.FaceRight ? 1 : -1;
+        float speed = stat.Face;
         if (sur.OnWall)
             speed *= wallDashSpeed;
         else
             speed *= dashSpeed;
 
-        tf.position += new Vector3(wallDashOffset.x * (stat.FaceRight ? -1 : 1), wallDashOffset.y, 0);
+        tf.position += new Vector3(-stat.Face * wallDashOffset.x, wallDashOffset.y, 0);
         // start dash animation
         animator.SetDashAnimation();
 
