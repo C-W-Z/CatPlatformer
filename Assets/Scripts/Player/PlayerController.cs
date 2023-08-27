@@ -223,7 +223,7 @@ skip_movement:
             if (X != tf.position.x)
                 return X;
         }
-        Debug.Log("All No Hit");
+        // Debug.Log("All No Hit");
         return tf.position.x;
     }
 
@@ -235,7 +235,7 @@ skip_movement:
             if (Y != tf.position.y)
                 return Y;
         }
-        Debug.Log("All No Hit");
+        // Debug.Log("All No Hit");
         return tf.position.y;
     }
 
@@ -452,7 +452,7 @@ skip_movement:
             yield break;
         }
 
-        Debug.Log("Jump");
+        // Debug.Log("Jump");
         // jump
         rb.AddForce(jumpForce * Vector2.up, ForceMode2D.Impulse);
         stat.Reset();
@@ -654,9 +654,9 @@ skip_movement:
         Turn();
         rb.AddForce(force, ForceMode2D.Impulse);
 
-        Debug.Log($"before {rb.velocity}");
-        yield return new WaitForSeconds(0.1f);
-        Debug.Log($"after {rb.velocity}");
+        // Debug.Log($"before {rb.velocity}");
+        // yield return new WaitForSeconds(0.1f);
+        // Debug.Log($"after {rb.velocity}");
     }
 
 #endregion

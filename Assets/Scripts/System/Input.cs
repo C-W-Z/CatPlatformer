@@ -7,14 +7,14 @@ public class Input : PersistentSingleton<Input>
     public static bool DashDown;
     void Update()
     {
-        H = UnityEngine.Input.GetAxis("Horizontal");
-        V = UnityEngine.Input.GetAxis("Vertical");
-        RawH = UnityEngine.Input.GetAxisRaw("Horizontal");
-        RawV = UnityEngine.Input.GetAxisRaw("Vertical");
-        MoveDown = UnityEngine.Input.GetButtonDown("Horizontal");
-        JumpDown = UnityEngine.Input.GetButtonDown("Jump");
-        JumpUp = UnityEngine.Input.GetButtonUp("Jump");
+        H         = UnityEngine.Input.GetAxis("Horizontal");
+        V         = UnityEngine.Input.GetAxis("Vertical");
+        RawH      = UnityEngine.Input.GetAxisRaw("Horizontal");
+        RawV      = UnityEngine.Input.GetAxisRaw("Vertical");
+        MoveDown  = UnityEngine.Input.GetButtonDown("Horizontal");
+        JumpDown  = UnityEngine.Input.GetButtonDown("Jump");
+        JumpUp    = UnityEngine.Input.GetButtonUp("Jump");
         WallPress = UnityEngine.Input.GetButton("Wall");
-        DashDown = UnityEngine.Input.GetButtonDown("Dash");
+        DashDown  = UnityEngine.Input.GetButtonDown("Dash");
     }
 }

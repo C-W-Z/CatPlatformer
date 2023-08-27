@@ -18,14 +18,14 @@ public class PlayerAnimator : MonoBehaviour
     [SerializeField] private Vector2 wallClimbDownPos = new(0, -0.3f);
 
     public void StartEmitTrail() => tr.emitting = true;
-    public void StopEmitTrail() => tr.emitting = false;
+    public void StopEmitTrail()  => tr.emitting = false;
     public void FlipY(bool f) => sr.flipY = f;
     public void SetAnimation()
     {
-        animator.SetBool("onGround", player.OnGround);
-        animator.SetBool("onWall", player.OnWall);
         animator.SetFloat("xSpeed", Mathf.Abs(player.RB.velocity.x));
         animator.SetFloat("yVeloc", player.RB.velocity.y);
+        animator.SetBool("onGround", player.OnGround);
+        animator.SetBool("onWall", player.OnWall);
         animator.SetBool("sneaking", player.IsSneaking);
         animator.SetBool("startJump", _startJumpAnimation);
         animator.SetBool("startLedgeGrab", _startLedgeGrabAnimation);
@@ -53,11 +53,11 @@ public class PlayerAnimator : MonoBehaviour
         else
             tf.localPosition = normalPos;
     }
-    public void SetJumpAnimation() => _startJumpAnimation = true;
+    public  void SetJumpAnimation()   => _startJumpAnimation = true;
     private void ResetJumpAnimation() => _startJumpAnimation = false;
-    public void SetLedgeGrabAnimation() => _startLedgeGrabAnimation = true;
+    public  void SetLedgeGrabAnimation()   => _startLedgeGrabAnimation = true;
     private void ResetLedgeGrabAnimation() => _startLedgeGrabAnimation = false;
-    public void SetDashAnimation() => _startDashAnimation = true;
+    public  void SetDashAnimation()   => _startDashAnimation = true;
     private void ResetDashAnimation() => _startDashAnimation = false;
     // for animation event
     public void LedgeClimbEnd() => player.LedgeClimbOver();

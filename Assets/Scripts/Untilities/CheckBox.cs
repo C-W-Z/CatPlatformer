@@ -52,7 +52,6 @@ public class CheckBox : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(tf.position, direction, distance, layer);
         if (hit.collider != null)
             return hit.point;
-        Debug.Log("no hit");
         return defaultPos;
     }
 
