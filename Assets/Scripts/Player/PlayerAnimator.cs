@@ -11,20 +11,15 @@ public class PlayerAnimator : MonoBehaviour
     private bool _startJumpAnimation = false;
     private bool _startLedgeGrabAnimation = false;
     private bool _startDashAnimation = false;
+    // sprite position
     [SerializeField] private Vector2 normalPos = new(0, 0);
     [SerializeField] private Vector2 wallGrabPos = new(0, -0.07f);
     [SerializeField] private Vector2 wallClimbUpPos = new(0, -0.07f);
     [SerializeField] private Vector2 wallClimbDownPos = new(0, -0.3f);
 
-    public void StartEmitTrail() {
-        tr.emitting = true;
-    }
-    public void StopEmitTrail() {
-        tr.emitting = false;
-    }
-    public void FlipY(bool f) {
-        sr.flipY = f;
-    }
+    public void StartEmitTrail() => tr.emitting = true;
+    public void StopEmitTrail() => tr.emitting = false;
+    public void FlipY(bool f) => sr.flipY = f;
     public void SetAnimation()
     {
         animator.SetBool("onGround", player.OnGround);
@@ -58,27 +53,12 @@ public class PlayerAnimator : MonoBehaviour
         else
             tf.localPosition = normalPos;
     }
-    public void SetJumpAnimation() {
-        _startJumpAnimation = true;
-    }
-    private void ResetJumpAnimation() {
-        _startJumpAnimation = false;
-    }
-    public void SetLedgeGrabAnimation() {
-        _startLedgeGrabAnimation = true;
-    }
-    private void ResetLedgeGrabAnimation() {
-        _startLedgeGrabAnimation = false;
-    }
-    public void SetDashAnimation() {
-        _startDashAnimation = true;
-    }
-    private void ResetDashAnimation() {
-        _startDashAnimation = false;
-    }
+    public void SetJumpAnimation() => _startJumpAnimation = true;
+    private void ResetJumpAnimation() => _startJumpAnimation = false;
+    public void SetLedgeGrabAnimation() => _startLedgeGrabAnimation = true;
+    private void ResetLedgeGrabAnimation() => _startLedgeGrabAnimation = false;
+    public void SetDashAnimation() => _startDashAnimation = true;
+    private void ResetDashAnimation() => _startDashAnimation = false;
     // for animation event
-    public void LedgeClimbEnd()
-    {
-        player.LedgeClimbOver();
-    }
+    public void LedgeClimbEnd() => player.LedgeClimbOver();
 }
