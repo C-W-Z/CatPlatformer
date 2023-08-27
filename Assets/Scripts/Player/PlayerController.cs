@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
         stat.ResetAll();
         _dashCooling = false;
         _canDashCount = 1;
+        animator.StopEmitTrail();
     }
 
     void Update()
@@ -68,6 +69,9 @@ public class PlayerController : MonoBehaviour
 
         if (sur.OnGround || sur.OnWall)
             _canDashCount = 1;
+
+        if (Mathf.Abs(rb.velocity.x) < 0.01f)
+            stat.Dashing = false;
 
         #endregion
 
@@ -680,10 +684,10 @@ skip_movement:
     [Header("Dash")]
     [SerializeField] private float timeBeforeDash = 0.02f;
     [SerializeField] private Vector2 wallDashOffset = new(0.03f, 0f);
-    [SerializeField] private float dashSpeed = 5f;
-    [SerializeField] private float wallDashSpeed = 5f;
-    [SerializeField] private float dashTime = 0.2f;
-    [SerializeField] private float runDashTime = 0.3f;
+    [SerializeField] private float dashSpeed = 3.33f;
+    [SerializeField] private float wallDashSpeed = 3.33f;
+    [SerializeField] private float dashTime = 0.3f;
+    [SerializeField] private float runDashTime = 0.5f;
     private bool _dashCooling = false;
     private int _canDashCount = 1;
     private Vector2 _velocityBeforeDash;
@@ -696,7 +700,6 @@ skip_movement:
         _canDashCount--;
         _dashCooling = true;
         stat.Reset();
-        stat.Dashing = true;
 
         // record origin velocity;
         _velocityBeforeDash = rb.velocity;
@@ -716,10 +719,13 @@ skip_movement:
         yield return new WaitForSeconds(timeBeforeDash);
 
         // dash
+        stat.Dashing = true;
+        animator.StartEmitTrail();
         rb.velocity = new Vector2(speed, 0);
 
         yield return new WaitForSeconds(stat.Running ? runDashTime : dashTime);
         // end dash
+        animator.StopEmitTrail();
         rb.velocity = _velocityBeforeDash;
         stat.Dashing = false;
         _dashCooling = false;

@@ -1410,7 +1410,7 @@ MonoBehaviour:
   wallDashOffset: {x: 0.03, y: 0}
   dashSpeed: 3.33
   wallDashSpeed: 3.33
-  dashTime: 0.33
+  dashTime: 0.3
   runDashTime: 0.5
 --- !u!1 &980277305
 GameObject:
@@ -2217,7 +2217,7 @@ TrailRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2238,7 +2238,7 @@ TrailRenderer:
   m_SortingLayerID: 839224745
   m_SortingLayer: 2
   m_SortingOrder: -100
-  m_Time: 5
+  m_Time: 1
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
@@ -2307,7 +2307,7 @@ TrailRenderer:
   m_MinVertexDistance: 0.1
   m_MaskInteraction: 0
   m_Autodestruct: 0
-  m_Emitting: 1
+  m_Emitting: 0
   m_ApplyActiveColorSpace: 1
 --- !u!1 &1790410452
 GameObject:
@@ -3114,6 +3114,7 @@ MonoBehaviour:
   tf: {fileID: 2062787983}
   sr: {fileID: 2062787984}
   animator: {fileID: 2062787985}
+  tr: {fileID: 1654884129}
   player: {fileID: 910239152}
   resetDelayTime: 0.1
   normalPos: {x: 0, y: 0}

@@ -5,6 +5,7 @@ public class PlayerAnimator : MonoBehaviour
     [SerializeField] private Transform tf;
     [SerializeField] private SpriteRenderer sr;
     [SerializeField] private Animator animator;
+    [SerializeField] private TrailRenderer tr;
     [SerializeField] private PlayerController player;
     [SerializeField] private float resetDelayTime = 0.1f;
     private bool _startJumpAnimation = false;
@@ -15,8 +16,13 @@ public class PlayerAnimator : MonoBehaviour
     [SerializeField] private Vector2 wallClimbUpPos = new(0, -0.07f);
     [SerializeField] private Vector2 wallClimbDownPos = new(0, -0.3f);
 
-    public void FlipY(bool f)
-    {
+    public void StartEmitTrail() {
+        tr.emitting = true;
+    }
+    public void StopEmitTrail() {
+        tr.emitting = false;
+    }
+    public void FlipY(bool f) {
         sr.flipY = f;
     }
     public void SetAnimation()
