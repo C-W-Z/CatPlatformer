@@ -35,13 +35,13 @@ public class PlayerController : MonoBehaviour
 
         #region Check States
 
-        if (input.RawH == 0)
+        if (Input.RawH == 0)
             stat.Running = false;
 
-        if (input.JumpDown)
+        if (Input.JumpDown)
             timer.LastPressJump = jumpBufferTime;
 
-        if (input.WallPress && input.JumpDown)
+        if (Input.WallPress && Input.JumpDown)
             timer.LastPressWallJump = wallJumpBufferTime;
 
         if (stat.Jumping && rb.velocity.y <= 0)
@@ -53,7 +53,7 @@ public class PlayerController : MonoBehaviour
         if (sur.OnGround && !stat.Jumping)
             timer.LastOnGround = coyoteTime;
 
-        if (stat.WallGrabbing && (!sur.OnWall || !input.WallPress || stat.LedgeGrabbing || stat.LedgeClimbing))
+        if (stat.WallGrabbing && (!sur.OnWall || !Input.WallPress || stat.LedgeGrabbing || stat.LedgeClimbing))
         {
             stat.WallGrabbing = false;
             stat.WallClimbing = false;
@@ -64,7 +64,7 @@ public class PlayerController : MonoBehaviour
 
         stat.JumpAirTiming = stat.Jumping && Mathf.Abs(rb.velocity.y) < jumpAirTimeYSpeed;
 
-        if ((stat.Sneaking && (input.RawV >= 0 || !OnGround || stat.WallGrabbing)) || (!stat.Sneaking && normalCollider.enabled == false))
+        if ((stat.Sneaking && (Input.RawV >= 0 || !OnGround || stat.WallGrabbing)) || (!stat.Sneaking && normalCollider.enabled == false))
             EndSneak();
 
         if (sur.OnGround || sur.OnWall)
@@ -80,22 +80,22 @@ public class PlayerController : MonoBehaviour
 
         #region Player Movements
 
-        if (input.DashDown && !stat.Dashing && !_dashCooling && _canDashCount > 0)
+        if (Input.DashDown && !stat.Dashing && !_dashCooling && _canDashCount > 0)
         {
             StartCoroutine(Dash());
             goto skip_movement;
         }
 
-        if (!stat.Sneaking && !stat.WallGrabbing && sur.OnGround && input.RawV < 0)
+        if (!stat.Sneaking && !stat.WallGrabbing && sur.OnGround && Input.RawV < 0)
             StartSneak();
 
         if (!stat.WallGrabbing && !stat.WallClimbing && !stat.Jumping && !stat.WallJumping && timer.LastOnGround > 0 && timer.LastPressJump > 0)
             StartCoroutine(Jump());
 
-        if (input.JumpUp && (stat.Jumping || stat.WallJumping) && rb.velocity.y > 0)
+        if (Input.JumpUp && (stat.Jumping || stat.WallJumping) && rb.velocity.y > 0)
             JumpCut();
 
-        if (!stat.WallGrabbing && input.WallPress && !stat.WallJumping)
+        if (!stat.WallGrabbing && Input.WallPress && !stat.WallJumping)
         {
             if (sur.OnWall)
                 StartCoroutine(StartWallGrab());
@@ -131,16 +131,15 @@ skip_movement:
 
             if (stat.LedgeGrabbing)
             {
-                if (input.JumpDown)
+                if (Input.JumpDown)
                     StartLedgeClimb();
-                if (input.RawV < 0)
+                if (Input.RawV < 0)
                     StartCoroutine(StartWallGrab());
             }
         }
 
         SetGravity();
-        if (!stat.Dashing)
-            CheckFaceDir();
+        CheckFaceDir();
 
         animator.SetAnimation();
     }
@@ -249,29 +248,6 @@ skip_movement:
 
 #region Input
 
-    [System.Serializable]
-    private struct Input
-    {
-        public float H, V, RawH, RawV;
-        public bool MoveDown;
-        public bool JumpDown, JumpUp;
-        public bool WallPress;
-        public bool DashDown;
-        public void Update()
-        {
-            H = UnityEngine.Input.GetAxis("Horizontal");
-            V = UnityEngine.Input.GetAxis("Vertical");
-            RawH = UnityEngine.Input.GetAxisRaw("Horizontal");
-            RawV = UnityEngine.Input.GetAxisRaw("Vertical");
-            MoveDown = UnityEngine.Input.GetButtonDown("Horizontal");
-            JumpDown = UnityEngine.Input.GetButtonDown("Jump");
-            JumpUp = UnityEngine.Input.GetButtonUp("Jump");
-            WallPress = UnityEngine.Input.GetButton("Wall");
-            DashDown = UnityEngine.Input.GetButtonDown("Dash");
-        }
-    }
-
-    private Input input;
     [Header("Input")]
     [SerializeField][Range(0f, 1f)] private float doubleMoveDownCheckTime = 0.5f;
     private bool _canCheckDoubleMoveDown = true;
@@ -279,9 +255,7 @@ skip_movement:
 
     private void GetInput()
     {
-        input.Update();
-
-        if (input.MoveDown)
+        if (Input.MoveDown)
             _moveDownCount++;
 
         if (_moveDownCount == 1 && _canCheckDoubleMoveDown)
@@ -379,15 +353,15 @@ skip_movement:
         // calculate move speed
         float targetSpeed, accelerate;
         if (stat.Running)
-            targetSpeed = input.H * maxRunSpeed;
+            targetSpeed = Input.H * maxRunSpeed;
         else if (stat.Sneaking)
-            targetSpeed = input.H * maxSneakSpeed;
+            targetSpeed = Input.H * maxSneakSpeed;
         else
-            targetSpeed = input.H * maxWalkSpeed;
+            targetSpeed = Input.H * maxWalkSpeed;
         if (stat.WallJumping)
-            accelerate = ((input.RawH > 0 && rb.velocity.x > 0) || (input.H < 0 && rb.velocity.x < 0)) ? wallJumpMoveAcceleration : wallJumpMoveDecceleration;
+            accelerate = ((Input.RawH > 0 && rb.velocity.x > 0) || (Input.H < 0 && rb.velocity.x < 0)) ? wallJumpMoveAcceleration : wallJumpMoveDecceleration;
         else
-            accelerate = ((input.RawH > 0 && rb.velocity.x > 0) || (input.H < 0 && rb.velocity.x < 0)) ? moveAcceleration : moveDecceleration;
+            accelerate = ((Input.RawH > 0 && rb.velocity.x > 0) || (Input.H < 0 && rb.velocity.x < 0)) ? moveAcceleration : moveDecceleration;
         // faster when air time
         if (stat.JumpAirTiming)
         {
@@ -398,7 +372,7 @@ skip_movement:
         float movement = speedDiff * accelerate;
         // friction
         float friction = 0;
-        if (timer.LastOnGround > 0 && input.RawH == 0)
+        if (timer.LastOnGround > 0 && Input.RawH == 0)
             friction = Mathf.Min(Mathf.Abs(rb.velocity.x), frictionAmount) * Mathf.Sign(rb.velocity.x);
         rb.AddForce((movement - friction) * Vector2.right, ForceMode2D.Force);
     }
@@ -422,13 +396,20 @@ skip_movement:
 
     private void CheckFaceDir()
     {
+        if (stat.Dashing)
+        {
+            if (stat.Face != Mathf.Sign(rb.velocity.x))
+                Turn();
+            return;
+        }
+
         animator.FlipY(stat.WallClimbing && rb.velocity.y < 0);
 
         if (stat.LedgeGrabbing || stat.LedgeClimbing || stat.WallGrabbing || stat.WallClimbing)
             return;
-        if (sur.OnWall && input.RawH == stat.Face)
+        if (sur.OnWall && Input.RawH == stat.Face)
             return;
-        if (input.RawH == -stat.Face)
+        if (Input.RawH == -stat.Face)
             Turn();
     }
 
@@ -450,7 +431,7 @@ skip_movement:
     [SerializeField] private float timeBeforeJump = 0.06f;
     [SerializeField] private float jumpForce = 4.5f;
     [SerializeField][Range(0f, 0.5f)] private float coyoteTime = 0.15f;
-    [SerializeField][Range(0f, 0.5f)] private float jumpBufferTime = 0.1f; // jump input buffer
+    [SerializeField][Range(0f, 0.5f)] private float jumpBufferTime = 0.1f; // jump Input buffer
     [Space(10)]
     [SerializeField] private float jumpAirTimeYSpeed = 0.5f;
     [SerializeField][Range(0f, 1f)] private float jumpAirTimeGravityMult = 0.3f;
@@ -519,7 +500,7 @@ skip_movement:
         else
             rb.gravityScale = GravityScale;
         // faster slide
-        if (sur.OnWall && input.RawV < 0 && !input.WallPress)
+        if (sur.OnWall && Input.RawV < 0 && !Input.WallPress)
             rb.velocity = new Vector2(rb.velocity.x, -fasterSlideSpeed);
         // limit max fall/slide speed
         else if (!sur.OnWall && rb.velocity.y < -maxFallSpeed)
@@ -633,7 +614,7 @@ skip_movement:
 
     private void WallClimb()
     {
-        if (input.RawV == 0)
+        if (Input.RawV == 0)
         {
             stat.WallClimbing = false;
             return;
@@ -641,7 +622,7 @@ skip_movement:
 
         stat.WallGrabbing = true;
         stat.WallClimbing = true;
-        rb.velocity = new Vector2(0, input.V * wallClimbSpeed);
+        rb.velocity = new Vector2(0, Input.V * wallClimbSpeed);
     }
 
     private IEnumerator WallJump()
