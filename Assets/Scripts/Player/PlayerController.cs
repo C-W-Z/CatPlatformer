@@ -479,8 +479,8 @@ skip_movement:
     }
 
     [Space(10)]
-    [SerializeField][Range(0f, 1f)] private float jumpCutVelocityMult = 0.5f;
-    [SerializeField][Min(1f)] private float jumpCutGravityMult = 1.4f;
+    [SerializeField][Range(0f, 1f)] private float jumpCutVelocityMult = 0.75f;
+    [SerializeField][Min(1f)] private float jumpCutGravityMult = 1.5f;
 
     private void JumpCut()
     {
