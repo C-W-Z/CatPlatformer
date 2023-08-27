@@ -119,7 +119,7 @@ skip_movement:
 
         #endregion
 
-        if (stat.WallGrabbing && !stat.WallClimbing)
+        if (!stat.Dashing && stat.WallGrabbing && !stat.WallClimbing)
             rb.velocity = Vector2.zero;
 
         if (stat.LedgeGrabbing || stat.LedgeClimbing)
@@ -139,7 +139,8 @@ skip_movement:
         }
 
         SetGravity();
-        CheckFaceDir();
+        if (!stat.Dashing)
+            CheckFaceDir();
 
         animator.SetAnimation();
     }
