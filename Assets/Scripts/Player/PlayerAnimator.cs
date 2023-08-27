@@ -33,7 +33,8 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetBool("wallGrabbing", player.IsWallGrabbing);
         animator.SetBool("wallClimbing", player.IsWallClimbing);
         animator.SetBool("wallJumping", player.IsWallJumping);
-        animator.SetBool("dashing", _startDashAnimation);
+        animator.SetBool("startDash", _startDashAnimation);
+        animator.SetBool("dashing", player.IsDashing);
 
         if (_startJumpAnimation)
             Invoke(nameof(ResetJumpAnimation), resetDelayTime);

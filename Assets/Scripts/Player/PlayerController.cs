@@ -77,7 +77,10 @@ public class PlayerController : MonoBehaviour
         #region Player Movements
 
         if (input.DashDown && !stat.Dashing && !_dashCooling && _canDashCount > 0)
+        {
             StartCoroutine(Dash());
+            goto skip_movement;
+        }
 
         if (!stat.Sneaking && !stat.WallGrabbing && sur.OnGround && input.RawV < 0)
             StartSneak();
@@ -351,6 +354,7 @@ skip_movement:
     public bool IsWallGrabbing => stat.WallGrabbing;
     public bool IsWallClimbing => stat.WallClimbing;
     public bool IsWallJumping => stat.WallJumping;
+    public bool IsDashing => stat.Dashing;
 
 #endregion
 
@@ -455,6 +459,14 @@ skip_movement:
         animator.SetJumpAnimation();
         // wait for animation frames before jump up
         yield return new WaitForSeconds(timeBeforeJump);
+
+        if (stat.Dashing)
+        {
+            _velocityBeforeDash.y = jumpForce;
+            yield break;
+        }
+
+        Debug.Log("Jump");
         // jump
         rb.AddForce(jumpForce * Vector2.up, ForceMode2D.Impulse);
         stat.Reset();
@@ -646,6 +658,12 @@ skip_movement:
         stat.WallClimbing = false;
         stat.WallJumping = true;
 
+        if (stat.Dashing)
+        {
+            _velocityBeforeDash = force;
+            yield break;
+        }
+
         rb.velocity = Vector2.zero;
         Turn();
         rb.AddForce(force, ForceMode2D.Impulse);
@@ -668,6 +686,7 @@ skip_movement:
     [SerializeField] private float runDashTime = 0.3f;
     private bool _dashCooling = false;
     private int _canDashCount = 1;
+    private Vector2 _velocityBeforeDash;
 
     private IEnumerator Dash()
     {
@@ -680,7 +699,7 @@ skip_movement:
         stat.Dashing = true;
 
         // record origin velocity;
-        Vector2 originVelocity = rb.velocity;
+        _velocityBeforeDash = rb.velocity;
         // calculate dash speed
         if (sur.OnWall)
             Turn();
@@ -701,7 +720,7 @@ skip_movement:
 
         yield return new WaitForSeconds(stat.Running ? runDashTime : dashTime);
         // end dash
-        rb.velocity = originVelocity;
+        rb.velocity = _velocityBeforeDash;
         stat.Dashing = false;
         _dashCooling = false;
     }

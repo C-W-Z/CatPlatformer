@@ -1408,10 +1408,10 @@ MonoBehaviour:
   defaultWallGrabOffset: {x: 0, y: 0}
   timeBeforeDash: 0.02
   wallDashOffset: {x: 0.03, y: 0}
-  dashSpeed: 5
-  runDashSpeed: 7.5
-  wallDashSpeed: 5
-  dashTime: 0.2
+  dashSpeed: 3.33
+  wallDashSpeed: 3.33
+  dashTime: 0.33
+  runDashTime: 0.5
 --- !u!1 &980277305
 GameObject:
   m_ObjectHideFlags: 0
